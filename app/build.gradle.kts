@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    id("io.freefair.lombok") version "8.13"
 }
 
 android {
@@ -37,7 +38,27 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+
+    implementation("com.google.android.material:material:1.12.0")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.5.3")
+    implementation("androidx.navigation:navigation-ui-ktx:2.5.3")
+
+    // Glide
+    implementation(libs.glide)
+    implementation(libs.navigation.fragment)
+    implementation(libs.navigation.ui)
+    annotationProcessor(libs.glide.compiler)
+
+    // Lombok dependencies
+    compileOnly(libs.lombok)
+    annotationProcessor(libs.lombok)
+
+    testCompileOnly(libs.lombok)
+    testAnnotationProcessor(libs.lombok)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
+
 }
