@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     id("io.freefair.lombok") version "8.13"
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -46,6 +47,7 @@ dependencies {
     implementation(libs.glide)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
+    implementation(libs.firebase.database)
     annotationProcessor(libs.glide.compiler)
 
     // Lombok dependencies
