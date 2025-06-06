@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">Collab App</string>
+    <string name="the_information_will_be_saved_for_the_next_purchase_click_on_the_details_to_edit">The information will be saved for the next purchase. Click on the details to edit.</string>
+    <string name="full_name">Full Name</string>
+    <string name="email">Email</string>
+    <string name="address">Address</string>
+    <string name="phone">Phone</string>
+    <string name="save">Save</string>
+    <string-array name="profile_menu_items">
+        <item>Edit Information</item>
+        <item>Notification</item>
+        <item>History</item>
+        <item>Policy</item>
+    </string-array>
 </resources>
