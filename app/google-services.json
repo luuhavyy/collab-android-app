@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "996727863026",
+    "firebase_url": "https://collabeyewears-default-rtdb.firebaseio.com",
+    "project_id": "collabeyewears",
+    "storage_bucket": "collabeyewears.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:996727863026:android:1ca0a59345a20dd86d026b",
+        "android_client_info": {
+          "package_name": "com.luuhavyy.collabapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-DAZLh24ASs5DCJTy025O0-KCF7WpMOI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
