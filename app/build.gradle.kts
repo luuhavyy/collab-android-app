@@ -43,11 +43,15 @@ dependencies {
     implementation(libs.navigation.fragment.ktx)
     implementation(libs.navigation.ui.ktx)
 
+    // Firebase
+    implementation(libs.firebase.database)
+    implementation(libs.firebase.storage)
+    implementation(libs.google.firebase.storage)
+
     // Glide
     implementation(libs.glide)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
-    implementation(libs.firebase.database)
     annotationProcessor(libs.glide.compiler)
 
     // Lombok dependencies

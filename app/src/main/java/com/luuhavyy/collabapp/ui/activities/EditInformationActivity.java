@@ -12,12 +12,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.luuhavyy.collabapp.R;
+import com.luuhavyy.collabapp.data.service.FirebaseImageService;
 
 public class EditInformationActivity extends AppCompatActivity {
 
     private EditText etName, etEmail, etAddress, etPhone, etGender;
     private Spinner spinnerGender;
     private Button btnSave;
+    FirebaseImageService imageService = new FirebaseImageService();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

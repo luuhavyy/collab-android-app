@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,6 +17,7 @@ import androidx.fragment.app.Fragment;
 
 import com.luuhavyy.collabapp.R;
 import com.luuhavyy.collabapp.ui.activities.EditInformationActivity;
+import com.luuhavyy.collabapp.ui.dialogs.ProfilePictureDialogFragment;
 
 import lombok.NoArgsConstructor;
 
@@ -69,6 +71,48 @@ public class ProfileFragment extends Fragment {
         logout.setOnClickListener(v -> {
             Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
         });
+
+        ImageButton btnAddAvatar = view.findViewById(R.id.btn_add_avatar);
+        btnAddAvatar.setOnClickListener(v -> {
+            ProfilePictureDialogFragment dialog = new ProfilePictureDialogFragment();
+            dialog.setListener(new ProfilePictureDialogFragment.Listener() {
+                @Override
+                public void onChangePicture() {
+                    dialog.showChooseChange(); // chuyển sang trạng thái chọn ảnh
+                }
+
+                @Override
+                public void onDeletePicture() {
+                    dialog.showConfirmDelete(); // chuyển sang xác nhận xóa
+                }
+
+                @Override
+                public void onChooseFromGallery() {
+                    Toast.makeText(requireContext(), "Gallery clicked", Toast.LENGTH_SHORT).show();
+                    // sau khi chọn ảnh → gọi confirm
+                    dialog.showConfirmChange();
+                }
+
+                @Override
+                public void onTakePicture() {
+                    Toast.makeText(requireContext(), "Camera clicked", Toast.LENGTH_SHORT).show();
+                    // sau khi chụp ảnh → gọi confirm
+                    dialog.showConfirmChange();
+                }
+
+                @Override
+                public void onConfirmDelete() {
+                    Toast.makeText(requireContext(), "Profile picture deleted", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onConfirmChange() {
+                    Toast.makeText(requireContext(), "Profile picture changed", Toast.LENGTH_SHORT).show();
+                }
+            });
+            dialog.show(getParentFragmentManager(), "ProfilePictureDialog");
+        });
+
     }
 
 }
