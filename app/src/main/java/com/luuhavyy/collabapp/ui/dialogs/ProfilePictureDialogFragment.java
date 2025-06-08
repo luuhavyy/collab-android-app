@@ -2,11 +2,14 @@ package com.luuhavyy.collabapp.ui.dialogs;
 
 import android.app.Dialog;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -14,24 +17,59 @@ import androidx.fragment.app.DialogFragment;
 
 import com.luuhavyy.collabapp.R;
 
-public class ProfilePictureDialogFragment extends DialogFragment {
+import lombok.Setter;
 
+public class ProfilePictureDialogFragment extends DialogFragment {
     public interface Listener {
         void onChangePicture();
+
         void onDeletePicture();
+
         void onChooseFromGallery();
+
         void onTakePicture();
+
         void onConfirmDelete();
-        void onConfirmChange();
+
+        void onConfirmChange(Runnable onSuccess, Runnable onError);
     }
 
+    private static final String ARG_IMAGE_URI = "arg_image_uri";
+    @Setter
     private Listener listener;
-    public void setListener(Listener listener) {
-        this.listener = listener;
+    private Uri imageUri;
+    private ImageView ivAvatar;
+
+    private enum State {DEFAULT, CONFIRM_DELETE, CHOOSE_CHANGE, CONFIRM_CHANGE}
+
+    private State currentState = State.DEFAULT;
+
+    public void setImageUri(Uri newImageUri) {
+        this.imageUri = newImageUri;
+        if (ivAvatar != null) {
+            if (imageUri != null) {
+                ivAvatar.setImageURI(imageUri);
+            } else {
+                ivAvatar.setImageResource(R.drawable.avatar_placeholder);
+            }
+        }
     }
 
-    private enum State { DEFAULT, CONFIRM_DELETE, CHOOSE_CHANGE, CONFIRM_CHANGE }
-    private State currentState = State.DEFAULT;
+    public static ProfilePictureDialogFragment newInstance(Uri imageUri) {
+        ProfilePictureDialogFragment fragment = new ProfilePictureDialogFragment();
+        Bundle args = new Bundle();
+        args.putParcelable(ARG_IMAGE_URI, imageUri);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            imageUri = getArguments().getParcelable(ARG_IMAGE_URI);
+        }
+    }
 
     @Nullable
     @Override
@@ -62,7 +100,7 @@ public class ProfilePictureDialogFragment extends DialogFragment {
     }
 
     private void render(ViewGroup root) {
-        root.removeAllViews(); // Xóa layout cũ
+        root.removeAllViews(); // Clear old layout
         LayoutInflater inflater = LayoutInflater.from(getContext());
         View layout;
         switch (currentState) {
@@ -76,6 +114,15 @@ public class ProfilePictureDialogFragment extends DialogFragment {
                     layout.findViewById(R.id.btn_delete_picture).setOnClickListener(v -> {
                         if (listener != null) listener.onDeletePicture();
                     });
+                }
+
+                ivAvatar = layout.findViewById(R.id.iv_avatar);
+                if (ivAvatar != null) {
+                    if (imageUri != null) {
+                        ivAvatar.setImageURI(imageUri);
+                    } else {
+                        ivAvatar.setImageResource(R.drawable.avatar_placeholder);
+                    }
                 }
                 break;
 
@@ -91,8 +138,22 @@ public class ProfilePictureDialogFragment extends DialogFragment {
 
             case CONFIRM_CHANGE:
                 layout = inflater.inflate(R.layout.dialog_profile_picture_confirm_change, root, false);
+
+                ivAvatar = layout.findViewById(R.id.iv_avatar);
+                if (ivAvatar != null && imageUri != null) {
+                    ivAvatar.setImageURI(imageUri);
+                }
+
                 layout.findViewById(R.id.btn_confirm_change).setOnClickListener(v -> {
-                    if (listener != null) listener.onConfirmChange();
+                    if (listener != null) listener.onConfirmChange(
+                            () -> {
+                                currentState = State.DEFAULT;
+                                render(root);
+                            },
+                            () -> {
+                                Toast.makeText(getContext(), "Cập nhật ảnh thất bại", Toast.LENGTH_SHORT).show();
+                            }
+                    );
                     dismiss();
                 });
                 break;
@@ -132,7 +193,6 @@ public class ProfilePictureDialogFragment extends DialogFragment {
     }
 
     private boolean hasPicture() {
-        // TODO: kiểm tra nếu user đã có ảnh avatar
-        return true;
+        return imageUri != null;
     }
 }

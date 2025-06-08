@@ -18,7 +18,6 @@ public class HomeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        // Inflate layout cho fragment
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
 }
