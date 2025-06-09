@@ -4,7 +4,6 @@ import android.content.Context;
 import android.net.Uri;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -14,12 +13,13 @@ import com.google.firebase.database.ValueEventListener;
 import com.luuhavyy.collabapp.data.model.User;
 import com.luuhavyy.collabapp.data.repository.UserRepository;
 import com.luuhavyy.collabapp.utils.ImageUtil;
+import com.luuhavyy.collabapp.utils.LoadingHandlerUtil;
+
+import org.apache.commons.lang3.ObjectUtils;
 
 import java.io.IOException;
 
-import lombok.Data;
 import lombok.Getter;
-import lombok.Setter;
 
 public class UserViewModel extends ViewModel {
     private final UserRepository userRepository;
@@ -31,7 +31,7 @@ public class UserViewModel extends ViewModel {
         userRepository = new UserRepository();
     }
 
-    public void fetchUserById(String uid) {
+    public void fetchUserById(String uid, LoadingHandlerUtil.TaskCallback callback) {
         userRepository.getUserById(uid, new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -41,24 +41,24 @@ public class UserViewModel extends ViewModel {
                 } else {
                     userLiveData.setValue(null);
                 }
+                callback.onComplete();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 userLiveData.setValue(null);
+                callback.onComplete();
             }
         });
     }
 
     public void updateProfilePicture(Context context, Uri imageUri, String userId, Runnable onSuccess, Runnable onError) {
         try {
-            String base64 = ImageUtil.uriToBase64(context, imageUri);
+            String base64 = null;
+            if (ObjectUtils.isNotEmpty(imageUri)) base64 = ImageUtil.uriToBase64(context, imageUri);
 
             userRepository.updateProfileImageBase64(userId, base64,
-                    () -> {
-                        fetchUserById(userId);
-                        onSuccess.run();
-                    },
+                    onSuccess,
                     onError
             );
 

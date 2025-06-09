@@ -58,6 +58,12 @@ dependencies {
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)
 
+    // Commons-lang3
+    implementation(libs.commons.lang3)
+
+    // Lottie - animation
+    implementation(libs.android.lottie)
+
     testCompileOnly(libs.lombok)
     testAnnotationProcessor(libs.lombok)
 

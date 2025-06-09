@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -33,41 +34,31 @@ import com.luuhavyy.collabapp.ui.dialogs.ErrorDialog;
 import com.luuhavyy.collabapp.ui.dialogs.ProfilePictureDialogFragment;
 import com.luuhavyy.collabapp.ui.viewmodels.UserViewModel;
 import com.luuhavyy.collabapp.utils.ImageUtil;
+import com.luuhavyy.collabapp.utils.LoadingHandlerUtil;
 
 import java.io.File;
 
-import lombok.NoArgsConstructor;
-
-@NoArgsConstructor
 public class ProfileFragment extends Fragment {
-    private ProfilePictureDialogFragment.Listener dialogListener;
-    private ProfilePictureDialogFragment dialogInUse;
-    private Uri imageUri = null;
-    private ActivityResultLauncher<Intent> galleryLauncher;
-    private ActivityResultLauncher<Intent> cameraLauncher;
     private UserViewModel userViewModel;
+    private Uri imageUri = null;
+    private ProfilePictureDialogFragment dialog;
+    private final String userId = "user005";
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    private final ActivityResultLauncher<Intent> galleryLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            this::onGalleryResult);
 
-        galleryLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(), result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                        imageUri = result.getData().getData();
-                        showConfirmChangeDialog(imageUri);
-                    }
-                }
-        );
+    private final ActivityResultLauncher<Intent> cameraLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            this::onCameraResult);
 
-        cameraLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(), result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        showConfirmChangeDialog(imageUri);
-                    }
-                }
-        );
-    }
+    private final ActivityResultLauncher<String> permissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(),
+                    granted -> {
+                        if (granted) openCamera();
+                        else
+                            Toast.makeText(requireContext(), "Permission denied", Toast.LENGTH_SHORT).show();
+                    });
 
     @Nullable
     @Override
@@ -82,28 +73,116 @@ public class ProfileFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
-        userViewModel.fetchUserById("user005");
-
-        userViewModel.getUserLiveData().observe(getViewLifecycleOwner(), user -> {
-            if (user != null) {
-                bindUserData(user, view);
-            } else {
-                ErrorDialog.show(requireContext(), "Failed to load user", () -> {
-                    userViewModel.fetchUserById("user005");
-                });
-            }
+        LoadingHandlerUtil.executeWithLoading(requireContext(), callback -> {
+            userViewModel.fetchUserById(userId, callback);
         });
 
-        dialogListener = new ProfilePictureDialogFragment.Listener() {
+        userViewModel.getUserLiveData().observe(getViewLifecycleOwner(), user -> {
+            if (user != null) bindUserData(user, view);
+            else
+                ErrorDialog.show(requireContext(), "Failed to load user", ()
+                        -> LoadingHandlerUtil.executeWithLoading(requireContext(),
+                        callback -> {
+                            userViewModel.fetchUserById(userId, callback);
+                        }));
+        });
+
+        setupMenu(view);
+        setupAvatarButton(view);
+        setupLogoutButton(view);
+    }
+
+    private void setupMenu(View view) {
+        LinearLayout menuContainer = view.findViewById(R.id.menu_container);
+        String[] menuItems = getResources().getStringArray(R.array.profile_menu_items);
+        menuContainer.removeAllViews();
+
+        for (int i = 0; i < menuItems.length; i++) {
+            menuContainer.addView(createMenuItem(menuItems[i], i));
+        }
+    }
+
+    private void setupLogoutButton(View view) {
+        view.findViewById(R.id.tv_logout).setOnClickListener(v -> {
+            Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
+            // Add logic logout
+        });
+    }
+
+    private TextView createMenuItem(String text, int index) {
+        TextView item = new TextView(requireContext());
+        item.setLayoutParams(new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
+        item.setText(text);
+        item.setTextSize(16);
+        item.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black));
+        item.setPadding(16, 20, 16, 20);
+        item.setBackgroundResource(R.drawable.item_ripple_background);
+        item.setOnClickListener(v -> handleMenuClick(index));
+        return item;
+    }
+
+    private void handleMenuClick(int index) {
+        if (index == 0) {
+            startActivity(new Intent(getActivity(), EditInformationActivity.class));
+        }
+        // Add more item here
+    }
+
+    private void setupAvatarButton(View view) {
+        ImageButton btnAddAvatar = view.findViewById(R.id.btn_add_avatar);
+        btnAddAvatar.setOnClickListener(v -> showProfilePictureDialog());
+    }
+
+    private void onGalleryResult(ActivityResult result) {
+        if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+            imageUri = result.getData().getData();
+            showConfirmChangeDialog(imageUri);
+        }
+    }
+
+    private void onCameraResult(ActivityResult result) {
+        if (result.getResultCode() == Activity.RESULT_OK) {
+            showConfirmChangeDialog(imageUri);
+        }
+    }
+
+    private void showProfilePictureDialog() {
+        dialog = ProfilePictureDialogFragment.newInstance(imageUri);
+        dialog.setListener(createDialogListener());
+        dialog.show(getParentFragmentManager(), "ProfilePictureDialog");
+    }
+
+    private void bindUserData(User user, View view) {
+        ((TextView) view.findViewById(R.id.tv_name)).setText(user.getName());
+        ((TextView) view.findViewById(R.id.tv_email)).setText(user.getEmail());
+        ((TextView) view.findViewById(R.id.tv_id)).setText(user.getUserid());
+
+        ShapeableImageView avatar = view.findViewById(R.id.avatar);
+        String base64 = user.getProfilepicture();
+
+        if (base64 != null && !base64.isEmpty()) {
+            imageUri = ImageUtil.saveBase64ImageToFile(requireContext(), base64);
+            if (imageUri != null) avatar.setImageURI(imageUri);
+            else avatar.setImageResource(R.drawable.avatar_placeholder);
+        } else {
+            avatar.setImageResource(R.drawable.avatar_placeholder);
+        }
+
+        if (dialog != null && dialog.isVisible()) dialog.setImageUri(imageUri);
+    }
+
+    private ProfilePictureDialogFragment.Listener createDialogListener() {
+        return new ProfilePictureDialogFragment.Listener() {
             @Override
             public void onChangePicture() {
-                if (dialogInUse != null) dialogInUse.showChooseChange();
+                dialog.showChooseChange();
             }
 
             @Override
             public void onDeletePicture() {
-                if (dialogInUse != null) dialogInUse.showConfirmDelete();
-
+                dialog.showConfirmDelete();
             }
 
             @Override
@@ -117,106 +196,42 @@ public class ProfileFragment extends Fragment {
             }
 
             @Override
-            public void onConfirmDelete() {
+            public void onConfirmDelete(Runnable onSuccess, Runnable onError) {
                 Toast.makeText(requireContext(), "Profile picture deleted", Toast.LENGTH_SHORT).show();
+                userViewModel.updateProfilePicture(requireContext(), null, userId, onSuccess, onError);
+                // Add logic delete avatar
             }
 
             @Override
             public void onConfirmChange(Runnable onSuccess, Runnable onError) {
                 if (imageUri != null) {
-                    userViewModel.updateProfilePicture(requireContext(), imageUri, "user005", onSuccess, onError);
+                    userViewModel.updateProfilePicture(requireContext(), imageUri, userId, onSuccess, onError);
+                    Toast.makeText(requireContext(), "Profile picture changed", Toast.LENGTH_SHORT).show();
                 } else {
                     onError.run();
                 }
-                Toast.makeText(requireContext(), "Profile picture changed", Toast.LENGTH_SHORT).show();
-                dialogInUse = new ProfilePictureDialogFragment();
-                dialogInUse.setImageUri(imageUri);
-                dialogInUse.setListener(dialogListener);
-                dialogInUse.show(getParentFragmentManager(), "ProfilePictureDialog");
             }
         };
-
-        LinearLayout menuContainer = view.findViewById(R.id.menu_container);
-        String[] menuItems = requireContext().getResources().getStringArray(R.array.profile_menu_items);
-
-        for (int i = 0; i < menuItems.length; i++) {
-            final int index = i;
-            TextView item = new TextView(requireContext());
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            );
-            params.setMargins(0, 4, 0, 4);
-            item.setLayoutParams(params);
-
-            item.setText(menuItems[i]);
-            item.setTextSize(16);
-            item.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black));
-            item.setPadding(16, 20, 16, 20);
-            item.setBackgroundResource(R.drawable.item_ripple_background);
-            item.setClickable(true);
-            item.setFocusable(true);
-
-            item.setOnClickListener(v -> {
-                if (index == 0) {
-                    startActivity(new Intent(getActivity(), EditInformationActivity.class));
-                }
-                // Add more cases if needed
-            });
-
-            menuContainer.addView(item);
-        }
-
-        TextView logout = view.findViewById(R.id.tv_logout);
-        logout.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
-        });
-
-        ImageButton btnAddAvatar = view.findViewById(R.id.btn_add_avatar);
-        btnAddAvatar.setOnClickListener(v -> {
-            dialogInUse = ProfilePictureDialogFragment.newInstance(imageUri);
-            dialogInUse.setListener(dialogListener);
-            dialogInUse.show(getParentFragmentManager(), "ProfilePictureDialog");
-        });
     }
 
-    private void bindUserData(User user, View view) {
-        TextView tvName = view.findViewById(R.id.tv_name);
-        TextView tvEmail = view.findViewById(R.id.tv_email);
-        TextView tvId = view.findViewById(R.id.tv_id);
-        ShapeableImageView avatarImage = view.findViewById(R.id.avatar);
-
-        tvName.setText(user.getName());
-        tvEmail.setText(user.getEmail());
-        tvId.setText(user.getUserid());
-
-        String base64 = user.getProfilepicture();
-        if (base64 != null && !base64.isEmpty()) {
-            imageUri = ImageUtil.saveBase64ImageToFile(requireContext(), base64);
-            if (imageUri != null) {
-                avatarImage.setImageURI(imageUri);
-
-                if (dialogInUse != null && dialogInUse.isVisible()) {
-                    dialogInUse.setImageUri(imageUri);
-                }
-            } else {
-                avatarImage.setImageResource(R.drawable.avatar_placeholder);
-            }
+    private void showConfirmChangeDialog(Uri uri) {
+        if (dialog != null && dialog.isVisible()) {
+            dialog.setImageUri(uri);
+            dialog.showConfirmChange();
         } else {
-            avatarImage.setImageResource(R.drawable.avatar_placeholder);
+            showProfilePictureDialog();
         }
     }
 
     private void openGallery() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        galleryLauncher.launch(intent);
+        galleryLauncher.launch(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI));
     }
 
     private void openCamera() {
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        File photoFile = createImageFile();
-        if (photoFile != null) {
-            imageUri = FileProvider.getUriForFile(requireContext(), requireContext().getPackageName() + ".provider", photoFile);
+        File file = createImageFile();
+        if (file != null) {
+            imageUri = FileProvider.getUriForFile(requireContext(), requireContext().getPackageName() + ".provider", file);
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
             cameraLauncher.launch(intent);
         } else {
@@ -225,49 +240,16 @@ public class ProfileFragment extends Fragment {
     }
 
     private File createImageFile() {
-        File storageDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        if (storageDir != null) {
-            return new File(storageDir, "avatar_" + System.currentTimeMillis() + ".jpg");
-        } else {
-            return null;
-        }
+        File dir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        return dir != null ? new File(dir, "avatar_" + System.currentTimeMillis() + ".jpg") : null;
     }
-
-    private void showConfirmChangeDialog(Uri uri) {
-        if (dialogInUse != null && dialogInUse.isVisible()) {
-            dialogInUse.setImageUri(uri);
-            dialogInUse.showConfirmChange();
-        } else {
-            dialogInUse = new ProfilePictureDialogFragment();
-            dialogInUse.setImageUri(uri);
-            dialogInUse.setListener(dialogListener);
-            dialogInUse.show(getParentFragmentManager(), "ProfilePictureDialog");
-        }
-    }
-
-    private ActivityResultLauncher<String> requestPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                if (isGranted) {
-                    onPermissionGranted();
-                } else {
-                    onPermissionDenied();
-                }
-            });
 
     private void checkAndRequestCameraPermission() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED) {
-            onPermissionGranted();
+            openCamera();
         } else {
-            requestPermissionLauncher.launch(Manifest.permission.CAMERA);
+            permissionLauncher.launch(Manifest.permission.CAMERA);
         }
-    }
-
-    private void onPermissionGranted() {
-        openCamera();
-    }
-
-    private void onPermissionDenied() {
-        Toast.makeText(requireContext(), "Permission denied", Toast.LENGTH_SHORT).show();
     }
 }
