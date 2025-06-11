@@ -8,18 +8,18 @@ import com.luuhavyy.collabapp.data.model.User;
 import com.luuhavyy.collabapp.data.remote.UserRemoteDataSource;
 
 public class UserRepository {
-    private final UserRemoteDataSource userRemoteDataSource;
+    private final UserRemoteDataSource remoteDataSource;
 
     public UserRepository() {
-        userRemoteDataSource = new UserRemoteDataSource();
+        remoteDataSource = new UserRemoteDataSource();
     }
 
-    public void getAllUsers(ValueEventListener listener) {
-        userRemoteDataSource.getAllUsers(listener);
+    public void listenToUserRealtime(String uid, ValueEventListener listener) {
+        remoteDataSource.getUserByIdRealtime(uid, listener);
     }
 
-    public void getUserById(String uid, ValueEventListener listener) {
-        userRemoteDataSource.getUserById(uid, listener);
+    public void removeUserListener(ValueEventListener listener) {
+        remoteDataSource.removeListener(listener);
     }
 
     public LiveData<User> getUserProfile() {
@@ -32,6 +32,6 @@ public class UserRepository {
     }
 
     public void updateProfileImageBase64(String userId, String base64Image, Runnable onSuccess, Runnable onError) {
-        userRemoteDataSource.updateProfilePictureBase64(userId, base64Image, onSuccess, onError);
+        remoteDataSource.updateProfilePictureBase64(userId, base64Image, onSuccess, onError);
     }
 }

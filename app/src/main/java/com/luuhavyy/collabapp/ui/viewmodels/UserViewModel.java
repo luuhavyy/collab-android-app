@@ -26,13 +26,18 @@ public class UserViewModel extends ViewModel {
     @Getter
     private final MutableLiveData<User> userLiveData = new MutableLiveData<>();
     private final MutableLiveData<Boolean> errorLiveData = new MutableLiveData<>();
-
+    private ValueEventListener userListener;
     public UserViewModel() {
         userRepository = new UserRepository();
     }
 
-    public void fetchUserById(String uid, LoadingHandlerUtil.TaskCallback callback) {
-        userRepository.getUserById(uid, new ValueEventListener() {
+    public void listenToUserRealtime(String uid, LoadingHandlerUtil.TaskCallback callback) {
+        if (userListener != null){
+            callback.onComplete();
+            return;
+        }
+
+        userListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
@@ -41,7 +46,7 @@ public class UserViewModel extends ViewModel {
                 } else {
                     userLiveData.setValue(null);
                 }
-                callback.onComplete();
+                    callback.onComplete();
             }
 
             @Override
@@ -49,7 +54,18 @@ public class UserViewModel extends ViewModel {
                 userLiveData.setValue(null);
                 callback.onComplete();
             }
-        });
+        };
+
+        userRepository.listenToUserRealtime(uid, userListener);
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        if (userListener != null) {
+            userRepository.removeUserListener(userListener);
+            userListener = null;
+        }
     }
 
     public void updateProfilePicture(Context context, Uri imageUri, String userId, Runnable onSuccess, Runnable onError) {

@@ -73,18 +73,17 @@ public class ProfileFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
-        LoadingHandlerUtil.executeWithLoading(requireContext(), callback -> {
-            userViewModel.fetchUserById(userId, callback);
+        LoadingHandlerUtil.executeOnceWithLoading(requireContext(), onLoaded -> {
+            userViewModel.listenToUserRealtime(userId, onLoaded);
         });
 
         userViewModel.getUserLiveData().observe(getViewLifecycleOwner(), user -> {
-            if (user != null) bindUserData(user, view);
-            else
-                ErrorDialog.show(requireContext(), "Failed to load user", ()
-                        -> LoadingHandlerUtil.executeWithLoading(requireContext(),
-                        callback -> {
-                            userViewModel.fetchUserById(userId, callback);
-                        }));
+            if (user != null) {
+                bindUserData(user, view);
+            } else {
+                ErrorDialog.show(requireContext(), "Failed to load user", () -> {
+                });
+            }
         });
 
         setupMenu(view);
