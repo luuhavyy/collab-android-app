@@ -15,12 +15,13 @@ import lombok.experimental.FieldDefaults;
 public class User {
     String userid;
     String username;
+    String password;
     String name;
     String email;
     String phonenumber;
     String profilepicture;
     String gender;
-//     defaultaddress;
+    String address;
 //    useractivity
 }
 

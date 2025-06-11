@@ -1,8 +1,5 @@
 package com.luuhavyy.collabapp.data.repository;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-
 import com.google.firebase.database.ValueEventListener;
 import com.luuhavyy.collabapp.data.model.User;
 import com.luuhavyy.collabapp.data.remote.UserRemoteDataSource;
@@ -22,13 +19,8 @@ public class UserRepository {
         remoteDataSource.removeListener(listener);
     }
 
-    public LiveData<User> getUserProfile() {
-        MutableLiveData<User> userData = new MutableLiveData<>();
-
-        User user = new User();
-        userData.setValue(user);
-
-        return userData;
+    public void updateUser(String uid, User user, Runnable onSuccess, Runnable onError) {
+        remoteDataSource.updateUser(uid, user, onSuccess, onError);
     }
 
     public void updateProfileImageBase64(String userId, String base64Image, Runnable onSuccess, Runnable onError) {

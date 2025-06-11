@@ -1,6 +1,7 @@
 package com.luuhavyy.collabapp.data.remote;
 
 import com.google.firebase.database.*;
+import com.luuhavyy.collabapp.data.model.User;
 
 public class UserRemoteDataSource {
     private final DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users");
@@ -13,6 +14,12 @@ public class UserRemoteDataSource {
     public ValueEventListener getUserByIdRealtime(String uid, ValueEventListener listener) {
         userRef.child(uid).addValueEventListener(listener);
         return listener;
+    }
+
+    public void updateUser(String uid, User user, Runnable onSuccess, Runnable onError) {
+        userRef.child(uid).setValue(user)
+                .addOnSuccessListener(unused -> onSuccess.run())
+                .addOnFailureListener(e -> onError.run());
     }
 
     public void removeListener(ValueEventListener listener) {

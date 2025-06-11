@@ -59,6 +59,10 @@ public class UserViewModel extends ViewModel {
         userRepository.listenToUserRealtime(uid, userListener);
     }
 
+    public void updateUserInfo(String uid, User updatedUser, Runnable onSuccess, Runnable onError) {
+        userRepository.updateUser(uid, updatedUser, onSuccess, onError);
+    }
+
     @Override
     protected void onCleared() {
         super.onCleared();
