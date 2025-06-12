@@ -26,13 +26,5 @@ public class UserProfileActivity extends AppCompatActivity {
         txtEmail = findViewById(R.id.txtEmail);
 
         viewModel = new ViewModelProvider(this).get(UserViewModel.class);
-
-        viewModel.getUser().observe(this, user -> {
-            if (user != null) {
-                txtName.setText(user.getName());
-                txtEmail.setText(user.getEmail());
-                Glide.with(this).load(user.getProfilepicture()).into(imgAvatar);
-            }
-        });
     }
 }
