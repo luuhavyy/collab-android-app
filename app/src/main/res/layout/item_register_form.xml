@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/textView16"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/dm_sans_medium"
+                android:layout_marginTop="50dp"
+                android:layout_marginStart="16dp"
+                android:text="@string/title_register_form_header"
+                android:textSize="26sp" />
+
+            <TextView
+                android:id="@+id/textView17"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="16dp"
+                android:fontFamily="@font/dm_sans_medium"
+                android:text="@string/title_form_description"
+                android:textColor="#B3A8A8"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/textView18"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="16dp"
+                android:fontFamily="@font/dm_sans_medium"
+                android:text="@string/title_form_fullname"
+                android:textSize="24sp" />
+
+            <EditText
+                android:id="@+id/edtFullName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="16dp"
+                android:ems="10"
+                android:fontFamily="@font/dm_sans_medium"
+                android:background="@drawable/bg_edittext_rect"
+                android:backgroundTint="#2EE0DBDB"
+                android:hint="@string/title_hint_fullname"
+                android:inputType="text"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/textView19"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/dm_sans_medium"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="16dp"
+                android:text="@string/title_form_username"
+                android:textSize="24sp" />
+
+            <EditText
+                android:id="@+id/edtUserName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="16dp"
+                android:ems="10"
+                android:fontFamily="@font/dm_sans_medium"
+                android:background="@drawable/bg_edittext_rect"
+                android:backgroundTint="#2EE0DBDB"
+                android:hint="@string/title_login_hint_username"
+                android:inputType="text"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/textView20"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="16dp"
+                android:fontFamily="@font/dm_sans_medium"
+                android:text="@string/title_form_email"
+                android:textSize="24sp" />
+
+            <EditText
+                android:id="@+id/edtEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="16dp"
+                android:ems="10"
+                android:fontFamily="@font/dm_sans_medium"
+                android:background="@drawable/bg_edittext_rect"
+                android:backgroundTint="#2EE0DBDB"
+                android:hint="@string/title_hint_email"
+                android:inputType="textEmailAddress"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/textView21"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="16dp"
+                android:fontFamily="@font/dm_sans_medium"
+                android:text="@string/title_form_gender"
+                android:textSize="24sp" />
+
+            <EditText
+                android:id="@+id/edtGender"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="16dp"
+                android:ems="10"
+                android:fontFamily="@font/dm_sans_medium"
+                android:background="@drawable/bg_edittext_rect"
+                android:backgroundTint="#2EE0DBDB"
+                android:hint="@string/title_hint_gender"
+                android:inputType="text"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/textView24"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="16dp"
+                android:fontFamily="@font/dm_sans_medium"
+                android:text="@string/title_login_password"
+                android:textSize="24sp" />
+
+            <EditText
+                android:id="@+id/edtPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="16dp"
+                android:ems="10"
+                android:fontFamily="@font/dm_sans_medium"
+                android:background="@drawable/bg_edittext_rect"
+                android:backgroundTint="#2EE0DBDB"
+                android:hint="@string/title_login_hint_password"
+                android:inputType="textPassword"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/textView25"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="16dp"
+                android:fontFamily="@font/dm_sans_medium"
+                android:text="@string/title_form_confirm_pass"
+                android:textSize="24sp" />
+
+            <EditText
+                android:id="@+id/edtConfirmPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="16dp"
+                android:ems="10"
+                android:fontFamily="@font/dm_sans_medium"
+                android:background="@drawable/bg_edittext_rect"
+                android:backgroundTint="#2EE0DBDB"
+                android:hint="@string/title_hint_confirm_pass"
+                android:inputType="textPassword"
+                android:textSize="20sp" />
+
+            <Button
+                android:id="@+id/btnConfirmation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="30dp"
+                android:fontFamily="@font/dm_sans_medium"
+                android:background="@drawable/bg_button_rounded"
+                app:backgroundTint="#B6B0B0"
+                android:text="@string/title_form_button_confirm"
+                android:textSize="24sp" />
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

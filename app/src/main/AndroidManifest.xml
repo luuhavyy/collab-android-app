@@ -12,9 +12,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CollabApp"
         tools:targetApi="31">
-        <activity
-            android:name=".MainActivity"
-            android:exported="true" />
+
+        <!-- Main launcher activity -->
         <activity
             android:name=".ui.activities.HomeActivity"
             android:exported="true">
@@ -23,8 +22,40 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activities.UserProfileActivity" />
-        <activity android:name=".ui.activities.EditInformationActivity" />
+
+        <!-- Other exported activities -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="true" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="true" />
+
+        <!-- Internal/non-exported activities -->
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ForgotPasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CheckoutActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CartActivity"
+            android:exported="false" />
+        <activity
+            android:name=".VoucherActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activities.UserProfileActivity" />
+        <activity
+            android:name=".ui.activities.EditInformationActivity" />
+
+        <!-- Meta-data (should be at the end) -->
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>

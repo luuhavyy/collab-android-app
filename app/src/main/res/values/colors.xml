@@ -8,4 +8,9 @@
     <color name="strong_green">#129D12</color>
     <color name="deep_green">#007537</color>
     <color name="gray">#888888</color>
+    <color name="button_teal">#B9BEBF</color>
+    <color name="green_button">#063B06</color>
+    <color name="gray_button">#B6B0B0</color>
+    <color name="default_edittext_color">#2EE0DBDB</color>
+    <color name="error_red">#FF0000</color>
 </resources>
