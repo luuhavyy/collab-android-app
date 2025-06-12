@@ -1,3 +1,134 @@
 <resources>
     <string name="app_name">Collab App</string>
+    <string name="title_login_welcome">Welcome back to\nCollab</string>
+    <string name="title_login_ask_for_signup">Did you have the account?</string>
+    <string name="title_login_link_signup">Sign up</string>
+    <string name="title_login_username">Username</string>
+    <string name="title_login_hint_username">Enter your user name</string>
+    <string name="title_login_password">Password</string>
+    <string name="title_login_button_signin">Sign in</string>
+    <string name="title_login_forgot_password">Forgot Password</string>
+    <string name="title_login_save_information">Save login information</string>
+    <string name="title_login_hint_password">Enter your password</string>
+    <string name="title_confirm_exit_title">Confirm exit</string>
+    <string name="title_confirm_exit_message">Are you sure want to exit?</string>
+    <string name="title_confirm_exit_ok">OK</string>
+    <string name="title_confirm_exit_cancel">Cancel</string>
+    <string name="title_forgot_password">Reset Password</string>
+    <string name="title_forgot_password_guide">Please enter your phone number to receive reset code</string>
+    <string name="title_forgot_password_label">Phone</string>
+    <string name="title_forgot_reset">Reset</string>
+    <string name="title_hint_forgot_password">Enter your phone number</string>
+    <string name="title_verification_label">Verification</string>
+    <string name="title_verify_phone" />
+    <string name="title_verify_ask_change_phone">Change phone number?</string>
+    <string name="title_verify_code_label">Verification Code</string>
+    <string name="title_verify_re_send">Re-send Code</string>
+    <string name="title_verify_timing_label">Code is valid for</string>
+    <string name="title_verify_continue">Continue</string>
+    <string name="title_update_pass">Update Password</string>
+    <string name="title_update_pass_message">Please enter your new password</string>
+    <string name="title_new_pass">New Password</string>
+    <string name="title_hint_new_pass">Enter your new password</string>
+    <string name="title_new_pass_confirm">Confirm New Password</string>
+    <string name="title_new_pass_button_save">Save Update</string>
+    <string name="title_hint_confirm_new_pass">Confirm your new password</string>
+    <string name="notification_empty_fields">Please fully enter username and password</string>
+    <string name="notification_login_success">Login Successfully</string>
+    <string name="notification_wrong_password">Login failed! Check your password</string>
+    <string name="notification_account_not_found">Login failed! Can not find your account</string>
+    <string name="notification_query_error">Another error: %1$s</string>
+    <string name="title_register_header">Register Account</string>
+    <string name="title_register_description">Create account for better experience</string>
+    <string name="title_register_button">Register</string>
+    <string name="title_register_back_login">Have an Account?  Sign In</string>
+    <string name="title_register_form_header"><![CDATA[Profile & Password]]></string>
+    <string name="title_form_description">Please confirm your information for create new account</string>
+    <string name="title_form_fullname">Fullname</string>
+    <string name="title_hint_fullname">Enter your fullname</string>
+    <string name="title_form_username">Username</string>
+    <string name="title_form_email">Email</string>
+    <string name="title_hint_email">Enter your email</string>
+    <string name="title_form_gender">Gender</string>
+    <string name="title_hint_gender">"Male or Female "</string>
+    <string name="title_form_confirm_pass">Confirm password</string>
+    <string name="title_hint_confirm_pass">Confirm your password</string>
+    <string name="title_form_button_confirm">Confirmation</string>
+    <string name="notification_wrong_credentials">Wrong login infor. Check your account</string>
+
+
+    <string name="toast_enter_phone">Please enter your phone number</string>
+    <string name="toast_invalid_phone_format">Invalid phone number format</string>
+    <string name="toast_phone_not_registered">Phone number not registered</string>
+    <string name="toast_database_error">Database error: %1$s</string>
+    <string name="toast_resend_code">New verification code sent: %1$s</string>
+    <string name="verify_phone_message">Is this your phone number, please clarify +%1$s</string>
+    <string name="toast_invalid_code">Invalid verification code</string>
+    <string name="toast_code_not_complete">Please enter a valid 4-digit code</string>
+    <string name="toast_password_mismatch">Passwords do not match</string>
+    <string name="toast_password_too_short">Password must be at least 6 characters</string>
+    <string name="toast_password_updated">Password updated successfully</string>
+    <string name="toast_update_failed">Failed to update password: %1$s</string>
+    <string name="toast_user_not_found">No user found with this phone number</string>
+
+
+    <string name="error_fullname_required">Full name is required</string>
+    <string name="error_username_required">Username is required</string>
+    <string name="error_valid_email_required">Valid email is required</string>
+    <string name="error_gender_required">Gender is required</string>
+    <string name="error_password_length">Password must be at least 6 characters</string>
+    <string name="error_password_mismatch">Passwords must match</string>
+    <string name="error_username_exists">Username already in use</string>
+    <string name="error_email_exists">Email already in use</string>
+    <string name="error_database_connection">Database connection error</string>
+    <string name="error_please_fill_all_fields">Please fill all required fields</string>
+    <string name="title_alert_register">Sign-up Account</string>
+    <string name="title_alert_register_header_success">Your account created</string>
+    <string name="title_alert_register_description">Best experiences for eyewear</string>
+    <string name="title_alert_register_continue">Continue</string>
+
+    <string name="title_alert_register_header_fail">There is something wrong</string>
+    <string name="title_alert_register_description_fail">Check your information again</string>
+    <string name="title_alert_register_back">Back to Sign-up</string>
+
+
+    <string name="title_cart_header">My Cart</string>
+    <string name="title_cart_voucher">Voucher</string>
+    <string name="title_cart_radiobutton_choose_all">Choose all</string>
+    <string name="title_cart_button_checkout">Checkout</string>
+    <string name="title_voucher_header">Voucher\n</string>
+    <string name="empty_cart">Your cart is empty</string>
+    <string name="select_items">Please select at least one item</string>
+    <string name="delete_confirm_title">Confirm Delete</string>
+    <string name="delete_confirm_message">Are you sure you want to delete selected items?</string>
+    <string name="delete_button">Delete</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="error_removing_item">Error removing item: %s</string>
+    <string name="error_updating_quantity">Error updating quantity: %s</string>
+    <string name="error_loading_cart">Error loading cart</string>
+    <string name="no_vouchers">No available vouchers</string>
+    <string name="error_loading_vouchers">Error loading vouchers: %s</string>
+    <string name="user_not_authenticated">User not authenticated</string>
+    <string name="select_items_to_delete">Select items to delete</string>
+    <string name="total_price">Total: %s VND</string>
+    <string name="title_voucher_button_apply">Apply</string>
+    <string name="user_mapping_not_found">User mapping not found</string>
+    <string name="error_loading_user_mapping">Error loading user mapping: %s</string>
+
+    <string name="cart_not_found">Cart not found</string>
+    <string name="error_loading_product">Error loading product</string>
+    <string name="no_items_selected">No items selected</string>
+    <string name="confirm_delete">Confirm Delete</string>
+    <string name="confirm_delete_items">Are you sure you want to delete selected items?</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="items_deleted">Items deleted</string>
+    <string name="cart_empty">Your cart is empty</string>
+    <string name="error_loading_promotion">Error loading promotion</string>
+    <string name="total_with_discount">Total: $%.2f (Discount: $%.2f)</string>
+    <string name="failed_to_mark_promotion">Failed to mark promotion as used: %s</string>
+    <string name="select_voucher_first">Please select a voucher first</string>
+    <string name="voucher_category_restriction">This voucher can only be applied to products in category: %s</string>
+
+
 </resources>

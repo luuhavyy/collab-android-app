@@ -3,6 +3,8 @@
     <style name="Base.Theme.CollabApp" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="android:fontFamily">@font/dm_sans_medium</item>
+        <item name="fontFamily">@font/dm_sans_medium</item>
     </style>
 
     <style name="Theme.CollabApp" parent="Base.Theme.CollabApp" />
