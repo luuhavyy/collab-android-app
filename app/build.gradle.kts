@@ -35,35 +35,42 @@ android {
 }
 
 dependencies {
-    // AndroidX & UI
+    // --- AndroidX & UI ---
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
 
-    // Navigation
+    // --- Navigation ---
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.fragment.ktx)
     implementation(libs.navigation.ui)
     implementation(libs.navigation.ui.ktx)
 
-    // Glide
-    implementation(libs.glide)
-    annotationProcessor(libs.glide.compiler)
-
-    // Firebase
+    // --- Firebase ---
     implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
     implementation(libs.firebase.database)
+    implementation(libs.firebase.storage)
     implementation("com.google.firebase:firebase-database-ktx")
     implementation("com.google.firebase:firebase-auth-ktx")
 
-    // Lombok
+    // --- Glide ---
+    implementation(libs.glide)
+    annotationProcessor(libs.glide.compiler)
+
+    // --- Lombok ---
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)
     testCompileOnly(libs.lombok)
     testAnnotationProcessor(libs.lombok)
 
-    // Testing
+    // --- Commons Lang3 ---
+    implementation(libs.commons.lang3)
+
+    // --- Lottie Animation ---
+    implementation(libs.android.lottie)
+
+    // --- Testing ---
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

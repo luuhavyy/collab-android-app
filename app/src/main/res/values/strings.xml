@@ -6,6 +6,10 @@
     <string name="address">Address</string>
     <string name="phone">Phone</string>
     <string name="save">Save</string>
+    <string name="logout">Logout</string>
+    <string name="general">General</string>
+    <string name="undefined">Undefined</string>
+    <string name="profile">Profile</string>
     <string-array name="profile_menu_items">
         <item>Edit Information</item>
         <item>Notification</item>
