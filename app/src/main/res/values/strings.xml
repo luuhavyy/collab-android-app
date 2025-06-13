@@ -145,6 +145,13 @@
     <string name="failed_to_mark_promotion">Failed to mark promotion as used: %s</string>
     <string name="select_voucher_first">Please select a voucher first</string>
     <string name="voucher_category_restriction">This voucher can only be applied to products in category: %s</string>
+    <string name="collab">Collab</string>
+    <string name="cart">Cart</string>
+    <string name="login_account">Login Account</string>
+    <string name="close">Close</string>
+    <string name="login">Login</string>
+    <string name="please_login_for_better_experience">Please Login for better experience</string>
+    <string name="username_login_register_via_email">Username login/ register via email</string>
 
 
 </resources>
