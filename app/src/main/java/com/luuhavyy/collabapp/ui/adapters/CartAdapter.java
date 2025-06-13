@@ -1,4 +1,4 @@
-package adapters;
+package com.luuhavyy.collabapp.ui.adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -15,9 +15,10 @@ import android.widget.TextView;
 
 import com.luuhavyy.collabapp.R;
 
-import models.CartItem;
-import models.Product;
 import java.util.List;
+
+import com.luuhavyy.collabapp.data.model.CartItem;
+import com.luuhavyy.collabapp.data.model.Product;
 
 public class CartAdapter extends BaseAdapter {
     private Context context;

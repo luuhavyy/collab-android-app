@@ -1,4 +1,4 @@
-package connectors;
+package com.luuhavyy.collabapp.connectors;
 
 import androidx.annotation.NonNull;
 
@@ -11,7 +11,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import models.Promotion;
+import com.luuhavyy.collabapp.data.model.Promotion;
 
 public class PromotionConnector {
     private final DatabaseReference databaseReference;

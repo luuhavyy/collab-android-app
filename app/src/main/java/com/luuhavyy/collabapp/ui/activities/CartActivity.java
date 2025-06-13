@@ -1,4 +1,4 @@
-package com.luuhavyy.collabapp;
+package com.luuhavyy.collabapp.ui.activities;
 
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -34,13 +34,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import adapters.CartAdapter;
-import connectors.CartConnector;
-import connectors.PromotionConnector;
-import models.Cart;
-import models.CartItem;
-import models.Product;
-import models.Promotion;
+import com.luuhavyy.collabapp.R;
+import com.luuhavyy.collabapp.ui.adapters.CartAdapter;
+import com.luuhavyy.collabapp.connectors.CartConnector;
+import com.luuhavyy.collabapp.connectors.PromotionConnector;
+import com.luuhavyy.collabapp.data.model.Cart;
+import com.luuhavyy.collabapp.data.model.CartItem;
+import com.luuhavyy.collabapp.data.model.Product;
+import com.luuhavyy.collabapp.data.model.Promotion;
 
 public class CartActivity extends AppCompatActivity implements CartAdapter.OnQuantityChangeListener {
     private ListView lvProductCart;
@@ -193,7 +194,7 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnQua
     }
 
     private void openVoucherActivity() {
-        Intent intent = new Intent(this, VoucherActivity.class);
+        Intent intent = new Intent(this, com.luuhavyy.collabapp.ui.activities.VoucherActivity.class);
         // Truyền dữ liệu giỏ hàng qua Intent
         intent.putExtra("cartItems", (Serializable) cartItems);
         intent.putExtra("products", (Serializable) products);
@@ -262,7 +263,7 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnQua
             return;
         }
 
-        Intent intent = new Intent(this, CheckoutActivity.class);
+        Intent intent = new Intent(this, com.luuhavyy.collabapp.ui.activities.CheckoutActivity.class);
         intent.putExtra("cart", currentCart);
         intent.putExtra("promotion", selectedPromotion);
         startActivity(intent);
@@ -292,7 +293,7 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnQua
         currentCart.setTotalamount(totalAmount);
         cartConnector.updateCartTotal(currentCart.getCartid(), totalAmount);
 
-        txtTotalValue.setText(getString(R.string.total_with_discount, totalAmount, discount));
+        txtTotalValue.setText(getString(R.string.total_with_discount, (int) totalAmount, (int) discount) + " VNĐ");
     }
 
     @Override

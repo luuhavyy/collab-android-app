@@ -1,4 +1,4 @@
-package com.luuhavyy.collabapp;
+package com.luuhavyy.collabapp.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,15 +17,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.luuhavyy.collabapp.R;
+import com.luuhavyy.collabapp.connectors.PromotionConnector;
+import com.luuhavyy.collabapp.data.model.CartItem;
+import com.luuhavyy.collabapp.data.model.Product;
+import com.luuhavyy.collabapp.data.model.Promotion;
+import com.luuhavyy.collabapp.ui.adapters.PromotionAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import adapters.PromotionAdapter;
-import connectors.PromotionConnector;
-import models.CartItem;
-import models.Product;
-import models.Promotion;
 
 public class VoucherActivity extends AppCompatActivity {
     private ListView listView;
