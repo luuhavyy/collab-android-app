@@ -27,6 +27,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.imageview.ShapeableImageView;
+import com.google.firebase.auth.FirebaseAuth;
 import com.luuhavyy.collabapp.R;
 import com.luuhavyy.collabapp.data.model.User;
 import com.luuhavyy.collabapp.ui.activities.EditInformationActivity;
@@ -104,7 +105,7 @@ public class ProfileFragment extends Fragment {
     private void setupLogoutButton(View view) {
         view.findViewById(R.id.tv_logout).setOnClickListener(v -> {
             Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
-            // Add logic logout
+            FirebaseAuth.getInstance().signOut();
         });
     }
 
