@@ -1,4 +1,4 @@
-package com.luuhavyy.collabapp;
+package com.luuhavyy.collabapp.ui.activities;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -26,7 +26,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import models.Users;
+import com.luuhavyy.collabapp.R;
+import com.luuhavyy.collabapp.ui.activities.RegisterActivity;
+import com.luuhavyy.collabapp.data.model.User;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -114,7 +116,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
-                        Users user = userSnapshot.getValue(Users.class);
+                        User user = userSnapshot.getValue(User.class);
                         if (user != null) {
                             // Attempt to sign in with the actual email
                             mAuth.signInWithEmailAndPassword(user.getEmail(), password)
@@ -157,7 +159,7 @@ public class LoginActivity extends AppCompatActivity {
         usersRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Users user = dataSnapshot.getValue(Users.class);
+                User user = dataSnapshot.getValue(User.class);
                 Intent intent = new Intent(LoginActivity.this, CartActivity.class);
                 intent.putExtra("USER_DATA", user);
                 startActivity(intent);
