@@ -159,12 +159,27 @@
             </LinearLayout>
 
             <!-- Product Section -->
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/products"
-                android:textSize="16sp" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/products"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:id="@+id/tv_filter_sort"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/filter_sorting"
+                    android:textColor="@color/dark_green"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_products"
