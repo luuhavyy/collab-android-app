@@ -152,6 +152,9 @@
     <string name="login">Login</string>
     <string name="please_login_for_better_experience">Please Login for better experience</string>
     <string name="username_login_register_via_email">Username login/ register via email</string>
-
-
+    <string name="products">Products</string>
+    <string name="sunglasses">Sunglasses</string>
+    <string name="categories">Categories</string>
+    <string name="frames">Frames</string>
+    <string name="search_product_name">Search Product Name</string>
 </resources>

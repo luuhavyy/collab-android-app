@@ -9,11 +9,13 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
-import androidx.navigation.ui.NavigationUI;
 
 import com.luuhavyy.collabapp.R;
+import com.luuhavyy.collabapp.utils.AuthUtil;
 
 public class HomeActivity extends AppCompatActivity {
+    private NavController navController;
+    private BottomNavigationView bottomNav;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -28,10 +30,32 @@ public class HomeActivity extends AppCompatActivity {
             return;
         }
 
-        NavController navController = navHostFragment.getNavController();
+        navController = navHostFragment.getNavController();
+        bottomNav = findViewById(R.id.bottom_nav);
 
-        BottomNavigationView bottomNav = findViewById(R.id.bottom_nav);
+        setupBottomNavigation();
+    }
 
-        NavigationUI.setupWithNavController(bottomNav, navController);
+    private void setupBottomNavigation() {
+        bottomNav.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.nav_home) {
+                navController.navigate(R.id.nav_home);
+                return true;
+            } else if (itemId == R.id.nav_noti) {
+                navController.navigate(R.id.nav_noti);
+                return true;
+            } else if (itemId == R.id.nav_order) {
+                navController.navigate(R.id.nav_order);
+                return true;
+            } else if (itemId == R.id.nav_profile) {
+                AuthUtil.checkLoginAndRedirect(this,
+                        () -> navController.navigate(R.id.nav_profile));
+                return AuthUtil.isLoggedIn();
+            }
+
+            return false;
+        });
     }
 }
