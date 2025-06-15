@@ -1,4 +1,4 @@
-package models;
+package com.luuhavyy.collabapp.data.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -8,7 +8,6 @@ public class Cart implements Serializable {
     private String cartid;
     private String userid;
     private List<CartItem> products = new ArrayList<>();
-
     private double totalamount;
     private String promotionid;
     private String createdat;

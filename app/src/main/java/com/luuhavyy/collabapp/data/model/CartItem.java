@@ -1,4 +1,4 @@
-package models;
+package com.luuhavyy.collabapp.data.model;
 
 import java.io.Serializable;
 

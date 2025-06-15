@@ -30,15 +30,15 @@
         </activity>
 
         <!-- Exported activities -->
-        <activity android:name=".LoginActivity" android:exported="true" />
-        <activity android:name=".MainActivity" android:exported="true" />
+        <activity android:name=".ui.activities.LoginActivity" android:exported="true" />
+        <activity android:name=".ui.activities.MainActivity" android:exported="true" />
 
         <!-- Internal/non-exported activities -->
-        <activity android:name=".RegisterActivity" android:exported="false" />
-        <activity android:name=".ForgotPasswordActivity" android:exported="false" />
-        <activity android:name=".CheckoutActivity" android:exported="false" />
-        <activity android:name=".CartActivity" android:exported="false" />
-        <activity android:name=".VoucherActivity" android:exported="false" />
+        <activity android:name=".ui.activities.RegisterActivity" android:exported="false" />
+        <activity android:name=".ui.activities.ForgotPasswordActivity" android:exported="false" />
+        <activity android:name=".ui.activities.CheckoutActivity" android:exported="false" />
+        <activity android:name=".ui.activities.CartActivity" android:exported="false" />
+        <activity android:name=".ui.activities.VoucherActivity" android:exported="false" />
         <activity android:name=".ui.activities.UserProfileActivity" />
         <activity android:name=".ui.activities.EditInformationActivity" />
 

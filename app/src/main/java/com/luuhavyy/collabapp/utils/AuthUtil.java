@@ -8,8 +8,8 @@ import android.view.View;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.luuhavyy.collabapp.LoginActivity;
 import com.luuhavyy.collabapp.R;
+import com.luuhavyy.collabapp.ui.activities.LoginActivity;
 
 public class AuthUtil {
 

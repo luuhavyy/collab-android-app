@@ -1,4 +1,4 @@
-package com.luuhavyy.collabapp;
+package com.luuhavyy.collabapp.ui.activities;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -29,8 +29,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import connectors.UserConnector;
-import models.Users;
+import com.luuhavyy.collabapp.R;
+import com.luuhavyy.collabapp.connectors.UserConnector;
+import com.luuhavyy.collabapp.data.model.User;
 
 public class RegisterActivity extends AppCompatActivity {
     private EditText edtPhoneNumberRegister;
@@ -379,7 +380,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void createNewUser(String phoneNumber, String fullName, String username,
                                String email, String gender, String password) {
-        Users newUser = new Users();
+        User newUser = new User();
         newUser.setPhonenumber(phoneNumber);
         newUser.setName(fullName);
         newUser.setUsername(username);
@@ -417,7 +418,7 @@ public class RegisterActivity extends AppCompatActivity {
                 });
     }
 
-    private void showSuccessDialog(Users user) {
+    private void showSuccessDialog(User user) {
         AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
         Resources res = getResources();
         builder.setTitle(res.getText(R.string.title_alert_register));

@@ -40,6 +40,7 @@ import com.luuhavyy.collabapp.utils.ImageUtil;
 import com.luuhavyy.collabapp.utils.LoadingHandlerUtil;
 
 import java.io.File;
+import com.luuhavyy.collabapp.data.model.User;
 
 public class ProfileFragment extends Fragment {
     private UserViewModel userViewModel;

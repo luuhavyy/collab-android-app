@@ -1,14 +1,9 @@
-package connectors;
+package com.luuhavyy.collabapp.connectors;
 
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
-import java.util.Objects;
-
-import models.Users;
 
 public class UserConnector {
     private final DatabaseReference databaseReference;

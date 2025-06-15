@@ -1,4 +1,4 @@
-package com.luuhavyy.collabapp;
+package com.luuhavyy.collabapp.ui.activities;
 
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -21,7 +21,9 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.database.DatabaseError;
-import connectors.UserConnector;
+import com.luuhavyy.collabapp.ui.activities.LoginActivity;
+import com.luuhavyy.collabapp.R;
+import com.luuhavyy.collabapp.connectors.UserConnector;
 
 public class ForgotPasswordActivity extends AppCompatActivity {
     private EditText edtPhoneNumber;

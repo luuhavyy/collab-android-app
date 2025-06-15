@@ -1,4 +1,4 @@
-package connectors;
+package com.luuhavyy.collabapp.connectors;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -6,8 +6,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
-import models.Cart;
-import models.CartItem;
+import com.luuhavyy.collabapp.data.model.CartItem;
 
 public class CartConnector {
     private DatabaseReference cartRef;

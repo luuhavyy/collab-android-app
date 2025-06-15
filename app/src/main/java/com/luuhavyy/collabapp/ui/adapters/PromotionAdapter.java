@@ -1,4 +1,4 @@
-package adapters;
+package com.luuhavyy.collabapp.ui.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,9 +9,10 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.luuhavyy.collabapp.R;
-import models.Promotion;
 
 import java.util.List;
+
+import com.luuhavyy.collabapp.data.model.Promotion;
 
 public class PromotionAdapter extends BaseAdapter {
     private Context context;

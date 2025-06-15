@@ -21,9 +21,9 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.tabs.TabLayout;
-import com.luuhavyy.collabapp.CartActivity;
 import com.luuhavyy.collabapp.R;
 import com.luuhavyy.collabapp.data.model.Banner;
+import com.luuhavyy.collabapp.ui.activities.CartActivity;
 import com.luuhavyy.collabapp.ui.adapters.BannerAdapter;
 import com.luuhavyy.collabapp.ui.adapters.ProductAdapter;
 import com.luuhavyy.collabapp.ui.viewmodels.ProductViewModel;
