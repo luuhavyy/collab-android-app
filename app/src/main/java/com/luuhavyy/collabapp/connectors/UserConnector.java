@@ -1,6 +1,8 @@
 package com.luuhavyy.collabapp.connectors;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
@@ -34,5 +36,9 @@ public class UserConnector {
 
     public Task<Void> updateUserPassword(String userId, String newPassword) {
         return databaseReference.child(userId).child("password").setValue(newPassword);
+    }
+    public void sendPasswordResetEmail(String email, OnCompleteListener<Void> listener) {
+        FirebaseAuth.getInstance().sendPasswordResetEmail(email)
+                .addOnCompleteListener(listener);
     }
 }

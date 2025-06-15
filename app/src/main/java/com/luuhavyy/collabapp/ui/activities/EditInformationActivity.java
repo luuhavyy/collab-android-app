@@ -90,8 +90,14 @@ public class EditInformationActivity extends AppCompatActivity {
     private void populateUserToForm(User user) {
         etName.setText(user.getName());
         etEmail.setText(user.getEmail());
-        etAddress.setText(user.getAddress());
         etPhone.setText(user.getPhonenumber());
+
+        // Handle address
+        if (user.getDefaultaddress() != null) {
+            User.Address address = user.getDefaultaddress();
+            String fullAddress = address.getStreet() + ", " + address.getCity() + ", " + address.getCountry();
+            etAddress.setText(fullAddress);
+        }
 
         for (int i = 0; i < genderOptions.length; i++) {
             if (genderOptions[i].equalsIgnoreCase(user.getGender())) {
@@ -104,11 +110,19 @@ public class EditInformationActivity extends AppCompatActivity {
     private void updateUserFromForm(User user) {
         user.setName(etName.getText().toString());
         user.setEmail(etEmail.getText().toString());
-        user.setAddress(etAddress.getText().toString());
         user.setPhonenumber(etPhone.getText().toString());
         user.setGender(spinnerGender.getSelectedItem().toString());
-    }
 
+        String[] addressParts = etAddress.getText().toString().split(",");
+        if (addressParts.length >= 3) {
+            User.Address address = User.Address.builder()
+                    .street(addressParts[0].trim())
+                    .city(addressParts[1].trim())
+                    .country(addressParts[2].trim())
+                    .build();
+            user.setDefaultaddress(address);
+        }
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {

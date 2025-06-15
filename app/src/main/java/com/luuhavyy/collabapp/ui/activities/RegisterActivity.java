@@ -44,6 +44,11 @@ public class RegisterActivity extends AppCompatActivity {
     private DatabaseReference userLookupRef;
     private DatabaseReference usersRef;
     private FirebaseAuth mAuth;
+    private DatabaseReference userCounterRef;
+
+    interface UserCreationCallback {
+        void onUserIdGenerated(String userId);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +69,7 @@ public class RegisterActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         userLookupRef = FirebaseDatabase.getInstance().getReference("userLookup/usernames");
         usersRef = FirebaseDatabase.getInstance().getReference("users");
+        userCounterRef = FirebaseDatabase.getInstance().getReference("userCounter");
     }
 
     private void initializeViews() {
@@ -166,7 +172,6 @@ public class RegisterActivity extends AppCompatActivity {
         EditText edtThird = verificationLayout.findViewById(R.id.edtThirdNumber);
         EditText edtLast = verificationLayout.findViewById(R.id.edtLastNumber);
 
-        // Setup text watchers for verification code fields
         setupVerificationCodeTextWatchers(edtFirst, edtSecond, edtThird, edtLast);
 
         Button btnContinue = verificationLayout.findViewById(R.id.btnContinue);
@@ -219,7 +224,6 @@ public class RegisterActivity extends AppCompatActivity {
         EditText edtConfirmPassword = registerFormLayout.findViewById(R.id.edtConfirmPassword);
         Button btnConfirm = registerFormLayout.findViewById(R.id.btnConfirmation);
 
-        // Set initial button state
         checkFormFields(btnConfirm, edtFullName, edtUsername, edtEmail,
                 edtGender, edtPassword, edtConfirmPassword);
 
@@ -263,6 +267,37 @@ public class RegisterActivity extends AppCompatActivity {
         btnConfirm.setBackgroundTintList(ColorStateList.valueOf(
                 allFilled ? getResources().getColor(R.color.green_button)
                         : getResources().getColor(R.color.gray_button)));
+    }
+
+    private void getNextUserId(final UserCreationCallback callback) {
+        usersRef.orderByKey().limitToLast(1).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                        String lastUserId = userSnapshot.getKey();
+                        if (lastUserId != null && lastUserId.startsWith("user")) {
+                            try {
+                                int lastNumber = Integer.parseInt(lastUserId.substring(4));
+                                String newUserId = "user" + String.format("%03d", lastNumber + 1);
+                                callback.onUserIdGenerated(newUserId);
+                            } catch (NumberFormatException e) {
+                                String newUserId = "user" + System.currentTimeMillis();
+                                callback.onUserIdGenerated(newUserId);
+                            }
+                            return;
+                        }
+                    }
+                }
+                callback.onUserIdGenerated("user001");
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                String newUserId = "user" + System.currentTimeMillis();
+                callback.onUserIdGenerated(newUserId);
+            }
+        });
     }
 
     private void registerUser(String phoneNumber, EditText edtFullName, EditText edtUsername,
@@ -331,7 +366,12 @@ public class RegisterActivity extends AppCompatActivity {
                                 showErrorDialog(getString(R.string.title_alert_register_header_fail),
                                         getString(R.string.error_email_exists));
                             } else {
-                                createNewUser(phoneNumber, fullName, username, email, gender, password);
+                                getNextUserId(new UserCreationCallback() {
+                                    @Override
+                                    public void onUserIdGenerated(String userId) {
+                                        createNewUser(phoneNumber, fullName, username, email, gender, password, userId);
+                                    }
+                                });
                             }
                         }
 
@@ -379,7 +419,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void createNewUser(String phoneNumber, String fullName, String username,
-                               String email, String gender, String password) {
+                               String email, String gender, String password, String userId) {
         User newUser = new User();
         newUser.setPhonenumber(phoneNumber);
         newUser.setName(fullName);
@@ -387,33 +427,42 @@ public class RegisterActivity extends AppCompatActivity {
         newUser.setEmail(email);
         newUser.setGender(gender);
         newUser.setPassword(password);
+        newUser.setUserid(userId);
 
-        // Tạo user trong Firebase Auth trước
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        String uid = mAuth.getCurrentUser().getUid();
-                        newUser.setUserid(uid);
-
-                        // Lưu user vào Realtime Database
-                        usersRef.child(uid).setValue(newUser)
+                        usersRef.child(userId).setValue(newUser)
                                 .addOnCompleteListener(dbTask -> {
                                     if (dbTask.isSuccessful()) {
-                                        // Thêm vào node tra cứu username
-                                        userLookupRef.child(username.toLowerCase()).setValue(uid)
+                                        userLookupRef.child(username.toLowerCase()).setValue(userId)
                                                 .addOnCompleteListener(lookupTask -> {
                                                     if (lookupTask.isSuccessful()) {
                                                         showSuccessDialog(newUser);
                                                     } else {
-                                                        showErrorDialog();
+                                                        mAuth.getCurrentUser().delete();
+                                                        usersRef.child(userId).removeValue();
+                                                        showErrorDialog(
+                                                                "System Error",
+                                                                "Cannot create account. Please try again."
+                                                        );
                                                     }
                                                 });
                                     } else {
-                                        showErrorDialog();
+                                        mAuth.getCurrentUser().delete();
+                                        showErrorDialog(
+                                                "System Error",
+                                                "Cannot create account. Please try again."
+                                        );
                                     }
                                 });
                     } else {
-                        showErrorDialog();
+                        showErrorDialog(
+                                "Registration Error",
+                                task.getException() != null
+                                        ? task.getException().getMessage()
+                                        : "Cannot create account. Please try again"
+                        );
                     }
                 });
     }
