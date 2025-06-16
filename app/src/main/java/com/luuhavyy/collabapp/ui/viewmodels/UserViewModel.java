@@ -25,14 +25,14 @@ public class UserViewModel extends ViewModel {
     private final UserRepository userRepository;
     @Getter
     private final MutableLiveData<User> userLiveData = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> errorLiveData = new MutableLiveData<>();
     private ValueEventListener userListener;
+
     public UserViewModel() {
         userRepository = new UserRepository();
     }
 
     public void listenToUserRealtime(String uid, LoadingHandlerUtil.TaskCallback callback) {
-        if (userListener != null){
+        if (userListener != null) {
             callback.onComplete();
             return;
         }
@@ -46,7 +46,7 @@ public class UserViewModel extends ViewModel {
                 } else {
                     userLiveData.setValue(null);
                 }
-                    callback.onComplete();
+                callback.onComplete();
             }
 
             @Override

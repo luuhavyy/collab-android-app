@@ -152,6 +152,18 @@
     <string name="login">Login</string>
     <string name="please_login_for_better_experience">Please Login for better experience</string>
     <string name="username_login_register_via_email">Username login/ register via email</string>
-
-
+    <string name="products">Products</string>
+    <string name="sunglasses">Sunglasses</string>
+    <string name="categories">Categories</string>
+    <string name="frames">Frames</string>
+    <string name="search_product_name">Search Product Name</string>
+    <string name="filter_sorting"><![CDATA[Filter & Sorting]]></string>
+    <string name="reset">Reset</string>
+    <string name="apply">Apply</string>
+    <string name="price_high_low">Price (High-Low)</string>
+    <string name="price_low_high">Price (Low-High)</string>
+    <string name="name_a_z">Name (A-Z)</string>
+    <string name="name_z_a">Name (Z-A)</string>
+    <string name="frame_glasses">Frame-glasses</string>
+    <string name="range_harga">Range Harga</string>
 </resources>
