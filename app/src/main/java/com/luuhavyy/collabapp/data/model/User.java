@@ -35,7 +35,7 @@ public class User implements Serializable {
     @AllArgsConstructor
     @NoArgsConstructor
     @FieldDefaults(level = AccessLevel.PRIVATE)
-    public static class Address {
+    public static class Address implements Serializable{
         private String city;
         private String country;
         private String street;

@@ -183,19 +183,22 @@ public class CheckoutActivity extends AppCompatActivity {
             validateForm();
         });
 
-        // Continue button click - Switch to banking info layout
+        // Continue button click - Switch to banking info layout or show confirmation for COD
         btnContinue.setOnClickListener(v -> {
             if (validateForm()) {
-                switchToBankingInfoLayout();
+                if (paymentMethod.equals("COD")) {
+                    showConfirmationDialog();
+                } else {
+                    switchToBankingInfoLayout();
+                }
             }
         });
-
         // Banking info layout listeners
         txtEditPersonalInfor.setOnClickListener(v -> switchToMainLayout());
         txtEdit.setOnClickListener(v -> switchToMainLayout());
         bankingInfoLayout.findViewById(R.id.imageView2).setOnClickListener(v -> switchToMainLayout());
 
-        // Banking info continue button
+        /// Banking info continue button
         bankingInfoLayout.findViewById(R.id.btnContinue).setOnClickListener(v -> {
             if (validateBankingInfoForm()) {
                 showConfirmationDialog();
@@ -267,9 +270,8 @@ public class CheckoutActivity extends AppCompatActivity {
         txtReceiverPhoneNumberView.setText(edtReceiverPhoneNumber.getText().toString());
         txtPaymentMethodView.setText(paymentMethod);
 
-        // Set order items and summary
+        // Set order items and summary - Use the existing adapter
         ListView listOrderItemsBanking = bankingInfoLayout.findViewById(R.id.listOrderItems);
-        checkoutAdapter = new CheckoutAdapter(this, selectedCartItems, selectedProducts);
         listOrderItemsBanking.setAdapter(checkoutAdapter);
 
         TextView txtSubtotalBanking = bankingInfoLayout.findViewById(R.id.txtSubtotal);
@@ -281,6 +283,10 @@ public class CheckoutActivity extends AppCompatActivity {
         txtDiscountBanking.setText(String.format("%,.0f VNĐ", discount));
         txtDeliveryFeeBanking.setText(String.format("%,.0f VNĐ", deliveryFee));
         txtTotalBanking.setText(String.format("%,.0f VNĐ", subtotal - discount + deliveryFee));
+
+        // Set click listeners for edit buttons
+        txtEditPersonalInfor.setOnClickListener(v -> switchToMainLayout());
+        txtEdit.setOnClickListener(v -> switchToMainLayout());
     }
 
     private void switchToNotificationLayout() {
@@ -324,51 +330,72 @@ public class CheckoutActivity extends AppCompatActivity {
     private void createOrder() {
         CheckoutConnector connector = new CheckoutConnector();
 
-        // Generate order ID
-        String orderId = "order" + UUID.randomUUID().toString().substring(0, 8);
+        // Generate sequential order ID by checking the last order in database
+        databaseReference.child("orders").orderByKey().limitToLast(1)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        String lastOrderId = "order000"; // Default starting ID
+                        if (snapshot.exists()) {
+                            for (DataSnapshot orderSnapshot : snapshot.getChildren()) {
+                                lastOrderId = orderSnapshot.getKey();
+                            }
+                        }
 
-        // Create shipping details
-        Order.ShippingDetails shippingDetails = new Order.ShippingDetails(
-                edtReceiverAddress.getText().toString(),
-                edtReceiverPhoneNumber.getText().toString(),
-                "3-5 business days" // Estimated delivery
-        );
+                        // Extract number and increment
+                        int lastNumber = Integer.parseInt(lastOrderId.replace("order", ""));
+                        String orderId = String.format("order%03d", lastNumber + 1);
 
-        // Create product items
-        List<Order.ProductItem> productItems = new ArrayList<>();
-        for (int i = 0; i < selectedCartItems.size(); i++) {
-            CartItem cartItem = selectedCartItems.get(i);
-            Product product = selectedProducts.get(i);
-            productItems.add(new Order.ProductItem(
-                    cartItem.getProductid(),
-                    cartItem.getQuantity(),
-                    product.getPrice(),
-                    true
-            ));
-        }
+                        // Create shipping details
+                        Order.ShippingDetails shippingDetails = new Order.ShippingDetails(
+                                edtReceiverAddress.getText().toString(),
+                                edtReceiverPhoneNumber.getText().toString(),
+                                "3-5 business days" // Estimated delivery
+                        );
 
-        // Get current date
-        String currentDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+                        // Create product items
+                        List<Order.ProductItem> productItems = new ArrayList<>();
+                        for (int i = 0; i < selectedCartItems.size(); i++) {
+                            CartItem cartItem = selectedCartItems.get(i);
+                            Product product = selectedProducts.get(i);
+                            productItems.add(new Order.ProductItem(
+                                    cartItem.getProductid(),
+                                    cartItem.getQuantity(),
+                                    product.getPrice(),
+                                    true
+                            ));
+                        }
 
-        // Create order
-        Order order = new Order(
-                orderId,
-                userId,
-                productItems,
-                "Pending",
-                subtotal,
-                discount,
-                subtotal - discount + deliveryFee,
-                currentDate,
-                shippingDetails,
-                paymentMethod
-        );
+                        // Get current date
+                        String currentDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
 
-        // Save order to database
-        connector.createOrder(order);
+                        // Create order
+                        Order order = new Order(
+                                orderId,
+                                userId,
+                                productItems,
+                                "Pending",
+                                subtotal,
+                                discount,
+                                subtotal - discount + deliveryFee,
+                                currentDate,
+                                shippingDetails,
+                                paymentMethod
+                        );
 
-        // Show success message
-        txtCheckoutStatus.setText("Order placed successfully!");
+                        // Save order to database
+                        connector.createOrder(order);
+
+                        // Show success message
+                        txtCheckoutStatus.setText("Order placed successfully!");
+                        switchToNotificationLayout();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(CheckoutActivity.this, "Error generating order ID", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private boolean validateForm() {
@@ -376,7 +403,7 @@ public class CheckoutActivity extends AppCompatActivity {
                 !edtReceiverEmail.getText().toString().isEmpty() &&
                 !edtReceiverAddress.getText().toString().isEmpty() &&
                 !edtReceiverPhoneNumber.getText().toString().isEmpty() &&
-                !paymentMethod.isEmpty();
+                paymentMethodGroup.getCheckedRadioButtonId() != -1;
 
         if (isValid) {
             btnContinue.setBackgroundColor(Color.parseColor("#063B06"));

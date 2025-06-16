@@ -1,8 +1,9 @@
 package com.luuhavyy.collabapp.data.model;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-public class Order {
+public class Order implements Serializable{
 
         private String orderid;
         private String userid;
@@ -16,7 +17,7 @@ public class Order {
         private String paymentmethod;
 
         // Nested class for each product in the order
-        public static class ProductItem {
+        public static class ProductItem implements Serializable {
             private String productid;
             private int quantity;
             private double price;
