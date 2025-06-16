@@ -14,12 +14,13 @@ import androidx.appcompat.widget.Toolbar;
 import com.luuhavyy.collabapp.R;
 import com.luuhavyy.collabapp.data.model.User;
 import com.luuhavyy.collabapp.ui.viewmodels.UserViewModel;
+import com.luuhavyy.collabapp.utils.AuthUtil;
 import com.luuhavyy.collabapp.utils.LoadingHandlerUtil;
 
 public class EditInformationActivity extends AppCompatActivity {
-    private User currentUser;
     private final UserViewModel userViewModel = new UserViewModel();
-    private final String userId = "user005";
+    private User currentUser;
+    private String userId;
     private EditText etName, etEmail, etAddress, etPhone;
     private Spinner spinnerGender;
     private Button btnSave;
@@ -31,6 +32,8 @@ public class EditInformationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit_information);
         setupToolbar();
         initViews();
+
+        userId = AuthUtil.getCurrentUser().getUid();
         loadUserData();
 
         btnSave.setOnClickListener(v -> {
