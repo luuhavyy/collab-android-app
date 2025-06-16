@@ -98,7 +98,8 @@ public class CartAdapter extends BaseAdapter {
         chkChooseProduct.setChecked(cartItem.isSelected());
         txtProductName.setText(product.getName());
 
-        txtProductPrice.setText(String.format("%,.0f", product.getPrice()));
+        double price = product.getPrice();
+        txtProductPrice.setText(String.format("%,.0f", price));
 
         // Load image from base64
         Bitmap productImage = getProductImage(product);

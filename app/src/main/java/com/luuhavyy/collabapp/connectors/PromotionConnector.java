@@ -1,5 +1,7 @@
 package com.luuhavyy.collabapp.connectors;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.google.firebase.database.DataSnapshot;
@@ -32,12 +34,36 @@ public class PromotionConnector {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<Promotion> userPromotions = new ArrayList<>();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Promotion promotion = snapshot.getValue(Promotion.class);
-                    if (promotion != null &&
-                            (promotion.getUserid() == null ||
-                                    promotion.getUserid().equals(userId) ||
-                                    promotion.getUserid().isEmpty())) {
-                        userPromotions.add(promotion);
+                    try {
+                        String id = snapshot.getKey();
+                        String discountType = snapshot.child("discounttype").getValue(String.class);
+
+                        // Handle discount value conversion safely
+                        Object discountValueObj = snapshot.child("discountvalue").getValue();
+                        long discountValue = 0L;
+
+                        if (discountValueObj instanceof Long) {
+                            discountValue = (Long) discountValueObj;
+                        } else if (discountValueObj instanceof Double) {
+                            discountValue = ((Double) discountValueObj).longValue();
+                        } else if (discountValueObj instanceof Integer) {
+                            discountValue = ((Integer) discountValueObj).longValue();
+                        }
+
+                        String categoryId = snapshot.child("categoryid").getValue(String.class);
+                        String promoUserId = snapshot.child("userid").getValue(String.class);
+
+                        if ((promoUserId == null || promoUserId.equals(userId) || promoUserId.isEmpty())) {
+                            Promotion promotion = new Promotion();
+                            promotion.setPromotionid(id);
+                            promotion.setDiscounttype(discountType);
+                            promotion.setDiscountvalue(discountValue);
+                            promotion.setCategoryid(categoryId);
+                            promotion.setUserid(promoUserId);
+                            userPromotions.add(promotion);
+                        }
+                    } catch (Exception e) {
+                        Log.e("PromotionConnector", "Error parsing promotion", e);
                     }
                 }
                 listener.onPromotionsLoaded(userPromotions);

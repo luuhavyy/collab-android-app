@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -194,40 +195,62 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnQua
     }
 
     private void openVoucherActivity() {
-        Intent intent = new Intent(this, com.luuhavyy.collabapp.ui.activities.VoucherActivity.class);
-        // Truyền dữ liệu giỏ hàng qua Intent
-        intent.putExtra("cartItems", (Serializable) cartItems);
-        intent.putExtra("products", (Serializable) products);
-        startActivityForResult(intent, 1);
+        Intent intent = new Intent(this, VoucherActivity.class);
+
+        intent.putExtra("cartid", currentCart.getCartid());
+        startActivityForResult(intent, 1); // requestCode = 1
     }
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
-            selectedPromotion = (Promotion) data.getSerializableExtra("selected_promotion");
-            if (currentCart != null && selectedPromotion != null) {
-                currentCart.setPromotionid(selectedPromotion.getPromotionid());
-                cartConnector.applyPromotion(currentCart.getCartid(), selectedPromotion.getPromotionid());
-                calculateTotal();
-                // Mark promotion as used if needed
-                promotionConnector.markPromotionAsUsed(selectedPromotion.getPromotionid(),
-                        new PromotionConnector.PromotionMarkListener() {
-                            @Override
-                            public void onMarkSuccess() {
-                                // Promotion marked as used successfully
-                            }
 
-                            @Override
-                            public void onMarkFailed(String errorMessage) {
-                                Toast.makeText(CartActivity.this,
-                                        "Failed to mark promotion as used: " + errorMessage,
-                                        Toast.LENGTH_SHORT).show();
+        if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
+            String promotionId = data.getStringExtra("selected_promotion_id");
+
+            if (promotionId != null && !promotionId.isEmpty()) {
+
+                promotionConnector.getPromotionById(promotionId, new PromotionConnector.PromotionLoadListener() {
+                    @Override
+                    public void onPromotionsLoaded(List<Promotion> loadedPromotions) {
+                        if (loadedPromotions != null && !loadedPromotions.isEmpty()) {
+                            selectedPromotion = loadedPromotions.get(0);
+
+                            if (currentCart != null) {
+                                currentCart.setPromotionid(selectedPromotion.getPromotionid());
+                                cartConnector.applyPromotion(currentCart.getCartid(), selectedPromotion.getPromotionid());
+                                calculateTotal();
+
+                                promotionConnector.markPromotionAsUsed(selectedPromotion.getPromotionid(),
+                                        new PromotionConnector.PromotionMarkListener() {
+                                            @Override
+                                            public void onMarkSuccess() {
+                                            }
+
+                                            @Override
+                                            public void onMarkFailed(String errorMessage) {
+                                                Toast.makeText(CartActivity.this,
+                                                        "Failed to mark promotion as used: " + errorMessage,
+                                                        Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
                             }
-                        });
+                        }
+                    }
+
+                    @Override
+                    public void onError(String message) {
+                        Toast.makeText(CartActivity.this,
+                                "Error loading detail information of voucher " + message,
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         }
     }
+
 
     private void deleteSelectedItems() {
         List<CartItem> itemsToRemove = new ArrayList<>();
@@ -270,32 +293,59 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnQua
     }
 
     private void calculateTotal() {
-        totalAmount = 0;
-
-        for (int i = 0; i < cartItems.size(); i++) {
-            if (cartItems.get(i).isSelected()) {
-                totalAmount += products.get(i).getPrice() * cartItems.get(i).getQuantity();
+        try {
+            if (cartItems == null || products == null ||
+                    cartItems.isEmpty() || products.isEmpty() ||
+                    cartItems.size() != products.size()) {
+                txtTotalValue.setText(getString(R.string.calculating));
+                return;
             }
-        }
 
-        double discount = 0;
-        if (selectedPromotion != null) {
-            if (selectedPromotion.getDiscounttype().equals("percentage")) {
-                discount = totalAmount * (selectedPromotion.getDiscountvalue() / 100);
-            } else if (selectedPromotion.getDiscounttype().equals("fixed")) {
-                discount = selectedPromotion.getDiscountvalue();
+            totalAmount = 0;
+            for (int i = 0; i < cartItems.size(); i++) {
+                if (cartItems.get(i) != null && products.get(i) != null &&
+                        cartItems.get(i).isSelected()) {
+                    double price = products.get(i).getPrice();
+                    int quantity = cartItems.get(i).getQuantity();
+                    if (price >= 0 && quantity > 0) {
+                        totalAmount += price * quantity;
+                    }
+                }
             }
-            totalAmount -= discount;
 
-            if (totalAmount < 0) totalAmount = 0;
+            double discount = 0;
+            if (selectedPromotion != null && selectedPromotion.getDiscounttype() != null) {
+                // FIXED: Proper handling of primitive long discount value
+                if ("percentage".equals(selectedPromotion.getDiscounttype())) {
+                    discount = totalAmount * ((double)selectedPromotion.getDiscountvalue() / 100.0);
+                } else if ("fixed".equals(selectedPromotion.getDiscounttype())) {
+                    discount = selectedPromotion.getDiscountvalue();
+                }
+
+                // Ensure discount doesn't exceed total amount
+                discount = Math.min(discount, totalAmount);
+                totalAmount -= discount;
+            }
+
+            totalAmount = Math.max(0, totalAmount);
+
+            if (currentCart != null) {
+                currentCart.setTotalamount(totalAmount);
+                cartConnector.updateCartTotal(currentCart.getCartid(), totalAmount);
+            }
+
+            String totalText = String.format("%,.0f VNĐ", totalAmount);
+            if (discount > 0) {
+                totalText += String.format(" (Discount: %,.0f VNĐ)", discount);
+            }
+            txtTotalValue.setText(totalText);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            txtTotalValue.setText(getString(R.string.error_calculating_total));
+            Log.e("CartActivity", "Error calculating total: " + e.getMessage());
         }
-
-        currentCart.setTotalamount(totalAmount);
-        cartConnector.updateCartTotal(currentCart.getCartid(), totalAmount);
-
-        txtTotalValue.setText(getString(R.string.total_with_discount, (int) totalAmount, (int) discount) + " VNĐ");
     }
-
     @Override
     public void onQuantityChanged(int position, int newQuantity) {
         cartItems.get(position).setQuantity(newQuantity);
