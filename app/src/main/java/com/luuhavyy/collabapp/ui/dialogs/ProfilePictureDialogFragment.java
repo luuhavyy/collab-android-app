@@ -22,19 +22,26 @@ import lombok.Setter;
 public class ProfilePictureDialogFragment extends DialogFragment {
     public interface Listener {
         void onChangePicture();
+
         void onDeletePicture();
+
         void onChooseFromGallery();
+
         void onTakePicture();
+
         void onConfirmDelete(Runnable onSuccess, Runnable onError);
+
         void onConfirmChange(Runnable onSuccess, Runnable onError);
     }
 
     private static final String ARG_IMAGE_URI = "arg_image_uri";
-    @Setter private Listener listener;
+    @Setter
+    private Listener listener;
     private Uri imageUri;
     private ImageView ivAvatar;
 
-    private enum State { DEFAULT, CONFIRM_DELETE, CHOOSE_CHANGE, CONFIRM_CHANGE }
+    private enum State {DEFAULT, CONFIRM_DELETE, CHOOSE_CHANGE, CONFIRM_CHANGE}
+
     private State currentState = State.DEFAULT;
 
     public void setImageUri(Uri uri) {
@@ -81,7 +88,7 @@ public class ProfilePictureDialogFragment extends DialogFragment {
 
     private void render(ViewGroup root) {
         root.removeAllViews();
-        LayoutInflater inflater = LayoutInflater.from(getContext());
+        LayoutInflater inflater = LayoutInflater.from(requireContext());
         View layout;
 
         switch (currentState) {
@@ -150,8 +157,9 @@ public class ProfilePictureDialogFragment extends DialogFragment {
             if (listener != null) listener.onConfirmChange(() -> {
                 currentState = State.DEFAULT;
                 render(root);
-            }, () -> Toast.makeText(requireContext(), "Cập nhật ảnh thất bại", Toast.LENGTH_SHORT).show());
-            dismiss();
+                dismiss();
+            }, () -> {
+            });
         });
         return layout;
     }
@@ -162,16 +170,13 @@ public class ProfilePictureDialogFragment extends DialogFragment {
             if (listener != null) {
                 listener.onConfirmDelete(
                         () -> {
-                            // Xử lý khi xác nhận xóa thành công
-                            Toast.makeText(requireContext(), "Xóa thành công", Toast.LENGTH_SHORT).show();
+                            dismiss();
                         },
                         () -> {
-                            // Xử lý khi có lỗi xảy ra
-                            Toast.makeText(requireContext(), "Lỗi khi xóa", Toast.LENGTH_SHORT).show();
+                            dismiss();
                         }
                 );
             }
-            dismiss();
         });
         return layout;
     }
