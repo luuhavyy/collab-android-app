@@ -26,6 +26,7 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.luuhavyy.collabapp.R;
@@ -34,6 +35,7 @@ import com.luuhavyy.collabapp.ui.activities.EditInformationActivity;
 import com.luuhavyy.collabapp.ui.dialogs.ErrorDialog;
 import com.luuhavyy.collabapp.ui.dialogs.ProfilePictureDialogFragment;
 import com.luuhavyy.collabapp.ui.viewmodels.UserViewModel;
+import com.luuhavyy.collabapp.utils.AuthUtil;
 import com.luuhavyy.collabapp.utils.ImageUtil;
 import com.luuhavyy.collabapp.utils.LoadingHandlerUtil;
 
@@ -44,7 +46,7 @@ public class ProfileFragment extends Fragment {
     private UserViewModel userViewModel;
     private Uri imageUri = null;
     private ProfilePictureDialogFragment dialog;
-    private final String userId = "user005";
+    private String userId = null;
 
     private final ActivityResultLauncher<Intent> galleryLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -74,9 +76,11 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        userId = AuthUtil.getCurrentUser().getUid();
+
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         LoadingHandlerUtil.executeOnceWithLoading(requireContext(), onLoaded -> {
-            userViewModel.listenToUserRealtime(userId, onLoaded);
+            userViewModel.listenToUserRealtime(userId, onLoaded);  // start listening for changes
         });
 
         userViewModel.getUserLiveData().observe(getViewLifecycleOwner(), user -> {
@@ -105,8 +109,11 @@ public class ProfileFragment extends Fragment {
 
     private void setupLogoutButton(View view) {
         view.findViewById(R.id.tv_logout).setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
             FirebaseAuth.getInstance().signOut();
+            Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
+
+            BottomNavigationView nav = requireActivity().findViewById(R.id.bottom_nav);
+            nav.setSelectedItemId(R.id.nav_home);
         });
     }
 

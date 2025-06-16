@@ -5,6 +5,7 @@
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
         <item name="android:fontFamily">@font/dm_sans_medium</item>
         <item name="fontFamily">@font/dm_sans_medium</item>
+        <item name="sliderStyle">@style/Widget.MaterialComponents.Slider</item>
     </style>
 
     <style name="Theme.CollabApp" parent="Base.Theme.CollabApp" />
