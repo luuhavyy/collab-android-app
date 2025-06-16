@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
@@ -145,7 +146,7 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnQua
                     for (DataSnapshot cartSnapshot : dataSnapshot.getChildren()) {
                         currentCart = cartSnapshot.getValue(Cart.class);
                         if (currentCart != null) {
-                            cartItems = currentCart.getProducts();
+                            cartItems = currentCart.getProducts() != null ? currentCart.getProducts() : new ArrayList<>();
                             loadProductsForCartItems();
                             if (currentCart.getPromotionid() != null && !currentCart.getPromotionid().isEmpty()) {
                                 loadSelectedPromotion(currentCart.getPromotionid());
@@ -194,13 +195,24 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnQua
     }
 
     private void openVoucherActivity() {
-        Intent intent = new Intent(this, com.luuhavyy.collabapp.ui.activities.VoucherActivity.class);
-        // Truyền dữ liệu giỏ hàng qua Intent
-        intent.putExtra("cartItems", (Serializable) cartItems);
-        intent.putExtra("products", (Serializable) products);
+        Intent intent = new Intent(this, VoucherActivity.class);
+
+        // Only pass the cart ID and let VoucherActivity fetch what it needs
+        if (currentCart != null) {
+            intent.putExtra("cartid", currentCart.getCartid());
+        }
+
+        // If you need to pass selected items, filter them first
+        ArrayList<String> selectedProductIds = new ArrayList<>();
+        for (int i = 0; i < cartItems.size(); i++) {
+            if (cartItems.get(i).isSelected()) {
+                selectedProductIds.add(products.get(i).getProductid());
+            }
+        }
+        intent.putStringArrayListExtra("selectedProductIds", selectedProductIds);
+
         startActivityForResult(intent, 1);
     }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -263,39 +275,64 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnQua
             return;
         }
 
-        Intent intent = new Intent(this, com.luuhavyy.collabapp.ui.activities.CheckoutActivity.class);
+        // Filter selected items and products
+        ArrayList<CartItem> selectedItems = new ArrayList<>();
+        ArrayList<Product> selectedProducts = new ArrayList<>();
+        for (int i = 0; i < cartItems.size(); i++) {
+            if (cartItems.get(i).isSelected()) {
+                selectedItems.add(cartItems.get(i));
+                selectedProducts.add(products.get(i));
+            }
+        }
+
+        if (selectedItems.isEmpty()) {
+            Toast.makeText(this, "Please select at least one item", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Intent intent = new Intent(this, CheckoutActivity.class);
         intent.putExtra("cart", currentCart);
-        intent.putExtra("promotion", selectedPromotion);
+        intent.putExtra("selectedPromotion", selectedPromotion);
+        intent.putParcelableArrayListExtra("selectedItems", selectedItems);
+        intent.putParcelableArrayListExtra("selectedProducts", selectedProducts);
         startActivity(intent);
     }
 
     private void calculateTotal() {
         totalAmount = 0;
+        double discount = 0;
 
+        if (cartItems == null || products == null || cartItems.size() != products.size()) {
+            txtTotalValue.setText("0 VNĐ");
+            return;
+        }
+
+        // Calculate subtotal
         for (int i = 0; i < cartItems.size(); i++) {
-            if (cartItems.get(i).isSelected()) {
+            if (cartItems.get(i) != null && products.get(i) != null && cartItems.get(i).isSelected()) {
                 totalAmount += products.get(i).getPrice() * cartItems.get(i).getQuantity();
             }
         }
 
-        double discount = 0;
+        // Apply discount if promotion exists
         if (selectedPromotion != null) {
-            if (selectedPromotion.getDiscounttype().equals("percentage")) {
-                discount = totalAmount * (selectedPromotion.getDiscountvalue() / 100);
-            } else if (selectedPromotion.getDiscounttype().equals("fixed")) {
+            if ("percentage".equals(selectedPromotion.getDiscounttype())) {
+                discount = totalAmount * (selectedPromotion.getDiscountvalue() / 100.0);
+            } else {
                 discount = selectedPromotion.getDiscountvalue();
             }
-            totalAmount -= discount;
-
-            if (totalAmount < 0) totalAmount = 0;
+            totalAmount = Math.max(0, totalAmount - discount);
         }
 
-        currentCart.setTotalamount(totalAmount);
-        cartConnector.updateCartTotal(currentCart.getCartid(), totalAmount);
+        // Update UI
+        txtTotalValue.setText(String.format("%.0f VNĐ (Discount: %.0f VNĐ)", totalAmount, discount));
 
-        txtTotalValue.setText(getString(R.string.total_with_discount, (int) totalAmount, (int) discount) + " VNĐ");
+        // Update cart total in database
+        if (currentCart != null) {
+            currentCart.setTotalamount(totalAmount);
+            cartConnector.updateCartTotal(currentCart.getCartid(), totalAmount);
+        }
     }
-
     @Override
     public void onQuantityChanged(int position, int newQuantity) {
         cartItems.get(position).setQuantity(newQuantity);
@@ -317,13 +354,18 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnQua
             public void onPromotionsLoaded(List<Promotion> loadedPromotions) {
                 if (loadedPromotions != null && !loadedPromotions.isEmpty()) {
                     selectedPromotion = loadedPromotions.get(0);
-                    calculateTotal();
+                    runOnUiThread(() -> {
+                        calculateTotal();
+                        cartAdapter.notifyDataSetChanged();
+                    });
                 }
             }
 
             @Override
             public void onError(String message) {
-                Toast.makeText(CartActivity.this, getString(R.string.error_loading_promotion), Toast.LENGTH_SHORT).show();
+                runOnUiThread(() ->
+                        Toast.makeText(CartActivity.this, getString(R.string.error_loading_promotion), Toast.LENGTH_SHORT).show()
+                );
             }
         });
     }

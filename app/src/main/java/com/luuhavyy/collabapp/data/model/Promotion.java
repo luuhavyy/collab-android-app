@@ -1,9 +1,9 @@
 package com.luuhavyy.collabapp.data.model;
 
-import java.io.Serializable;
-import java.security.Timestamp;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-public class Promotion implements Serializable {
+public class Promotion implements Parcelable {
     private String promotionid;
     private String userid;
     private String categoryid;
@@ -18,17 +18,49 @@ public class Promotion implements Serializable {
     public Promotion() {
     }
 
-    public Promotion(String promotionid, String userid, String categoryid, String discounttype, long discountvalue, String validfrom, String validuntil, boolean isused, String promotioncode, boolean selected) {
-        this.promotionid = promotionid;
-        this.userid = userid;
-        this.categoryid = categoryid;
-        this.discounttype = discounttype;
-        this.discountvalue = discountvalue;
-        this.validfrom = validfrom;
-        this.validuntil = validuntil;
-        this.isused = isused;
-        this.promotioncode = promotioncode;
-        this.selected = selected;
+    protected Promotion(Parcel in) {
+        promotionid = in.readString();
+        userid = in.readString();
+        categoryid = in.readString();
+        discounttype = in.readString();
+        discountvalue = in.readLong();
+        validfrom = in.readString();
+        validuntil = in.readString();
+        isused = in.readByte() != 0;
+        promotioncode = in.readString();
+        selected = in.readByte() != 0;
+    }
+
+    public static final Creator<Promotion> CREATOR = new Creator<Promotion>() {
+        @Override
+        public Promotion createFromParcel(Parcel in) {
+            return new Promotion(in);
+        }
+
+        @Override
+        public Promotion[] newArray(int size) {
+            return new Promotion[size];
+        }
+    };
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(promotionid);
+        dest.writeString(userid);
+        dest.writeString(categoryid);
+        dest.writeString(discounttype);
+        dest.writeLong(discountvalue);
+        dest.writeString(validfrom);
+        dest.writeString(validuntil);
+        dest.writeByte((byte) (isused ? 1 : 0));
+        dest.writeString(promotioncode);
+        dest.writeByte((byte) (selected ? 1 : 0));
     }
 
     public String getPromotionid() {

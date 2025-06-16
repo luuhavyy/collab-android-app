@@ -14,4 +14,6 @@
     <color name="default_edittext_color">#2EE0DBDB</color>
     <color name="error_red">#FF0000</color>
     <color name="light_gray">#D9D9D9</color>
+    <color name="colorPrimary">#063B06</color>
+    <color name="disabled_gray">#B6B0B0</color>
 </resources>

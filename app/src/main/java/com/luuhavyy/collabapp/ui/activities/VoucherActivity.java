@@ -25,7 +25,15 @@ import com.luuhavyy.collabapp.data.model.Promotion;
 import com.luuhavyy.collabapp.ui.adapters.PromotionAdapter;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+
 
 public class VoucherActivity extends AppCompatActivity {
     private ListView listView;
@@ -42,10 +50,22 @@ public class VoucherActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_voucher);
 
+
+
+        cartItems = new ArrayList<>();
+        products = new ArrayList<>();
+
         Intent intent = getIntent();
         if (intent != null) {
-            cartItems = (List<CartItem>) intent.getSerializableExtra("cartItems");
-            products = (List<Product>) intent.getSerializableExtra("products");
+            // Get the selected product IDs instead of full objects
+            ArrayList<String> selectedProductIds = intent.getStringArrayListExtra("selectedProductIds");
+            String cartId = intent.getStringExtra("cartid");
+
+
+            // initialize empty lists to prevent NPE
+            if (selectedProductIds != null) {
+                // You would normally fetch the actual data here
+            }
         }
 
         listView = findViewById(R.id.listview);
@@ -59,28 +79,25 @@ public class VoucherActivity extends AppCompatActivity {
 
         btnApply.setOnClickListener(v -> {
             Promotion selected = promotionAdapter.getSelectedPromotion();
-
             if (selected == null) {
                 Toast.makeText(this, R.string.select_voucher_first, Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            if (selected.getCategoryid() != null && !selected.getCategoryid().isEmpty()) {
-                boolean hasMatchingProduct = false;
-                for (int i = 0; i < cartItems.size(); i++) {
-                    if (cartItems.get(i).isSelected() &&
-                            products.get(i).getCategoryid().equals(selected.getCategoryid())) {
-                        hasMatchingProduct = true;
-                        break;
+            // Check if voucher is expired
+            try {
+                if (selected.getValiduntil() != null && !selected.getValiduntil().isEmpty()) {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                    Date expiryDate = sdf.parse(selected.getValiduntil());
+                    if (expiryDate != null && new Date().after(expiryDate)) {
+                        Toast.makeText(this, "Voucher has expired", Toast.LENGTH_SHORT).show();
+                        return;
                     }
                 }
-
-                if (!hasMatchingProduct) {
-                    Toast.makeText(this,
-                            getString(R.string.voucher_category_restriction, selected.getCategoryid()),
-                            Toast.LENGTH_LONG).show();
-                    return;
-                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Error checking voucher validity", Toast.LENGTH_SHORT).show();
+                return;
             }
 
             Intent resultIntent = new Intent();
@@ -88,7 +105,6 @@ public class VoucherActivity extends AppCompatActivity {
             setResult(RESULT_OK, resultIntent);
             finish();
         });
-
         imgBack.setOnClickListener(v -> finish());
     }
 

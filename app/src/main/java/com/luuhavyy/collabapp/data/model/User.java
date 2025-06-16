@@ -1,5 +1,7 @@
 package com.luuhavyy.collabapp.data.model;
 
+import android.location.Address;
+
 import java.io.Serializable;
 
 import lombok.AccessLevel;
@@ -15,6 +17,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+
 public class User implements Serializable {
     String userid;
     String username;
@@ -24,7 +27,20 @@ public class User implements Serializable {
     String phonenumber;
     String profilepicture;
     String gender;
-    String address;
+    Address defaultaddress;
+
+
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @FieldDefaults(level = AccessLevel.PRIVATE)
+    public static class Address {
+        private String city;
+        private String country;
+        private String street;
+    }
+
+
 //    useractivity
 }
-

@@ -1,10 +1,12 @@
 package com.luuhavyy.collabapp.data.model;
 
-import java.io.Serializable;
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class Cart implements Serializable {
+public class Cart implements Parcelable {
     private String cartid;
     private String userid;
     private List<CartItem> products = new ArrayList<>();
@@ -16,15 +18,45 @@ public class Cart implements Serializable {
     public Cart() {
     }
 
-    public Cart(String cartid, String userid, List<CartItem> products, double totalamount, String promotionid, String createdat, String updatedat) {
-        this.cartid = cartid;
-        this.userid = userid;
-        this.products = products;
-        this.totalamount = totalamount;
-        this.promotionid = promotionid;
-        this.createdat = createdat;
-        this.updatedat = updatedat;
+    protected Cart(Parcel in) {
+        cartid = in.readString();
+        userid = in.readString();
+        products = in.createTypedArrayList(CartItem.CREATOR);
+        totalamount = in.readDouble();
+        promotionid = in.readString();
+        createdat = in.readString();
+        updatedat = in.readString();
     }
+
+    public static final Creator<Cart> CREATOR = new Creator<Cart>() {
+        @Override
+        public Cart createFromParcel(Parcel in) {
+            return new Cart(in);
+        }
+
+        @Override
+        public Cart[] newArray(int size) {
+            return new Cart[size];
+        }
+    };
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(cartid);
+        dest.writeString(userid);
+        dest.writeTypedList(products);
+        dest.writeDouble(totalamount);
+        dest.writeString(promotionid);
+        dest.writeString(createdat);
+        dest.writeString(updatedat);
+    }
+
 
     public String getCartid() {
         return cartid;

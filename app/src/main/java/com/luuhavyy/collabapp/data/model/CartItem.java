@@ -1,8 +1,9 @@
 package com.luuhavyy.collabapp.data.model;
 
-import java.io.Serializable;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-public class CartItem implements Serializable {
+public class CartItem implements Parcelable {
     private String productid;
     private int quantity;
     private double price;
@@ -18,6 +19,39 @@ public class CartItem implements Serializable {
         this.isSelected = isSelected;
     }
 
+    protected CartItem(Parcel in) {
+        productid = in.readString();
+        quantity = in.readInt();
+        price = in.readDouble();
+        isSelected = in.readByte() != 0;
+    }
+
+    public static final Creator<CartItem> CREATOR = new Creator<CartItem>() {
+        @Override
+        public CartItem createFromParcel(Parcel in) {
+            return new CartItem(in);
+        }
+
+        @Override
+        public CartItem[] newArray(int size) {
+            return new CartItem[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(productid);
+        dest.writeInt(quantity);
+        dest.writeDouble(price);
+        dest.writeByte((byte) (isSelected ? 1 : 0));
+    }
+
+    // Getter và Setter
     public String getProductid() {
         return productid;
     }

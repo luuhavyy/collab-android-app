@@ -140,7 +140,7 @@ public class RegisterActivity extends AppCompatActivity {
         mainLayout.addView(verificationLayout);
 
         TextView txtPhoneNumber = verificationLayout.findViewById(R.id.txtPhoneNumber);
-        txtPhoneNumber.setText("Is this your phone number, please clarify +" + phoneNumber);
+        txtPhoneNumber.setText("Is this your Phone Number, please clarify +" + phoneNumber);
 
         TextView txtChangePhone = verificationLayout.findViewById(R.id.txtChangePhone);
         txtChangePhone.setOnClickListener(v -> {
@@ -158,7 +158,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         TextView txtResendCode = verificationLayout.findViewById(R.id.textView12);
         txtResendCode.setOnClickListener(v -> {
-            Toast.makeText(this, "New verification code sent: 2345", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "A new verification code sent: 2345", Toast.LENGTH_SHORT).show();
         });
 
         EditText edtFirst = verificationLayout.findViewById(R.id.edtFirstNumber);
@@ -205,6 +205,9 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void showRegistrationForm(String phoneNumber) {
+
+
+
         mainLayout.removeAllViews();
         mainLayout.addView(registerFormLayout);
         setupRegistrationForm(phoneNumber);
