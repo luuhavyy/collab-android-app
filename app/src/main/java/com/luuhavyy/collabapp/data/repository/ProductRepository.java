@@ -23,4 +23,12 @@ public class ProductRepository {
                 .endAt(filterSort.maxPrice)
                 .addListenerForSingleValueEvent(listener);
     }
+
+    public void searchProductByName(String keyword, ValueEventListener listener) {
+        FirebaseDatabase.getInstance().getReference("products")
+                .orderByChild("name")
+                .startAt(keyword)
+                .endAt(keyword + "\uf8ff")
+                .addListenerForSingleValueEvent(listener);
+    }
 }

@@ -1,15 +1,14 @@
 package com.luuhavyy.collabapp.ui.fragments;
 
-import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ViewFlipper;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,6 +22,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.luuhavyy.collabapp.R;
 import com.luuhavyy.collabapp.data.model.Banner;
 import com.luuhavyy.collabapp.ui.activities.CartActivity;
+import com.luuhavyy.collabapp.ui.activities.SearchActivity;
 import com.luuhavyy.collabapp.ui.adapters.BannerAdapter;
 import com.luuhavyy.collabapp.ui.adapters.ProductAdapter;
 import com.luuhavyy.collabapp.ui.dialogs.DialogFilterAndSorting;
@@ -83,6 +83,16 @@ public class HomeFragment extends Fragment {
             }
             return false;
         });
+
+        // Setup search
+        EditText etSearch = view.findViewById(R.id.et_search);
+        ImageView ivSearch = view.findViewById(R.id.iv_search);
+
+        View.OnClickListener openSearch = v -> {
+            startActivity(new Intent(requireContext(), SearchActivity.class));
+        };
+        etSearch.setOnClickListener(openSearch);
+        ivSearch.setOnClickListener(openSearch);
 
         // Setup filter & sorting
         TextView tvFilterSort = view.findViewById(R.id.tv_filter_sort);

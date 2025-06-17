@@ -110,6 +110,33 @@ public class ProductViewModel extends ViewModel {
         });
     }
 
+    public void searchProductByName(String keyword, LoadingHandlerUtil.TaskCallback callback) {
+        if (productListener != null) {
+            callback.onComplete();
+            return;
+        }
+
+        repository.searchProductByName(keyword, new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<Product> result = new ArrayList<>();
+                for (DataSnapshot child : snapshot.getChildren()) {
+                    Product product = child.getValue(Product.class);
+                    if (product != null && product.getName().toLowerCase().contains(keyword.toLowerCase())) {
+                        result.add(product);
+                    }
+                }
+                productsLiveData.setValue(result);
+                callback.onComplete();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.onComplete();
+            }
+        });
+    }
+
     @Override
     protected void onCleared() {
         super.onCleared();

@@ -41,6 +41,7 @@
         <activity android:name=".ui.activities.VoucherActivity" android:exported="false" />
         <activity android:name=".ui.activities.UserProfileActivity" />
         <activity android:name=".ui.activities.EditInformationActivity" />
+        <activity android:name=".ui.activities.SearchActivity"/>
 
         <!-- Meta-data -->
         <meta-data

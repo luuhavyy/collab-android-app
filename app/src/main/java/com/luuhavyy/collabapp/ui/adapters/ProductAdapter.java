@@ -14,13 +14,19 @@ import com.luuhavyy.collabapp.R;
 import com.luuhavyy.collabapp.data.model.Product;
 import com.luuhavyy.collabapp.utils.ImageUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
     private List<Product> products;
 
     public ProductAdapter(List<Product> products) {
-        this.products = products;
+        this.products = products != null ? products : new ArrayList<>();
+    }
+
+    public void setProducts(List<Product> products) {
+        this.products = products != null ? products : new ArrayList<>();
+        notifyDataSetChanged();
     }
 
     @NonNull
