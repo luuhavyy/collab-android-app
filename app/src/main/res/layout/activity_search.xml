@@ -3,22 +3,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     android:orientation="vertical"
-    android:background="@color/white">
+    android:fitsSystemWindows="true">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
+    <com.google.android.material.appbar.MaterialToolbar        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/white"
-        android:title="@string/search"
+        android:titleTextColor="@color/white"
+        app:title="@string/search"
         app:titleCentered="true"
         app:titleTextColor="@color/dark_green"/>
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:padding="16dp">
 
         <!-- Search Bar -->
@@ -53,19 +53,19 @@
 
         <!-- History -->
         <TextView
-            android:layout_marginTop="16dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:text="History"
-            android:textStyle="bold"
-            android:textColor="@color/black"/>
+            android:textColor="@color/black"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:id="@+id/layout_history"
-            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"/>
+            android:layout_marginTop="8dp"
+            android:orientation="vertical" />
     </LinearLayout>
 
     <!-- Danh sách sản phẩm kết quả search -->
@@ -73,16 +73,16 @@
         android:id="@+id/tv_product"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Product"
         android:padding="16dp"
-        android:textStyle="bold"
-        android:textColor="@color/black"/>
+        android:text="Product"
+        android:textColor="@color/black"
+        android:textStyle="bold" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_products"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1" />
 
     <!-- No Product View here -->
     <LinearLayout
@@ -102,17 +102,17 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:text="There are no suitable products"
             android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp" />
+            android:textStyle="bold" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Please try using other keywords to find the product name"
-            android:textSize="14sp"
             android:layout_marginTop="8dp"
-            android:textColor="#888888" />
+            android:text="Please try using other keywords to find the product name"
+            android:textColor="#888888"
+            android:textSize="14sp" />
     </LinearLayout>
 </LinearLayout>

@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -38,6 +39,7 @@ public class SearchActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
+        setupToolbar();
 
         etSearch = findViewById(R.id.et_search);
         ivSearch = findViewById(R.id.iv_search);
@@ -110,12 +112,28 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
+    private void setupToolbar() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back);
+        }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
+    }
+
     // Handle save/remove search history
     private void loadSearchHistory() {
         searchHistory.clear();
         searchHistory.addAll(PreferenceManager.getDefaultSharedPreferences(this)
                 .getStringSet("search_history", new HashSet<>()));
     }
+
     private void saveSearchHistory(String keyword) {
         loadSearchHistory();
         searchHistory.remove(keyword);
@@ -125,6 +143,7 @@ public class SearchActivity extends AppCompatActivity {
                 .putStringSet("search_history", new HashSet<>(searchHistory))
                 .apply();
     }
+
     private void removeSearchHistory(String keyword) {
         loadSearchHistory();
         searchHistory.remove(keyword);
