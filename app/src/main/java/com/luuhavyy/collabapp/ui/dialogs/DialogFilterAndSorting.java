@@ -18,14 +18,24 @@ import androidx.fragment.app.DialogFragment;
 import com.google.android.material.slider.RangeSlider;
 import com.google.android.material.tabs.TabLayout;
 import com.luuhavyy.collabapp.R;
+import com.luuhavyy.collabapp.data.model.ProductFilterSort;
 
 import java.util.List;
 
 public class DialogFilterAndSorting extends DialogFragment {
-
     public static DialogFilterAndSorting newInstance() {
         return new DialogFilterAndSorting();
     }
+
+    public interface OnFilterApplyListener {
+        void onFilterApplied(ProductFilterSort filterSort);
+    }
+
+    public void setOnFilterApplyListener(OnFilterApplyListener listener) {
+        this.listener = listener;
+    }
+
+    private OnFilterApplyListener listener;
 
     @Nullable
     @Override
@@ -83,7 +93,26 @@ public class DialogFilterAndSorting extends DialogFragment {
 
         // Apply button
         btnApply.setOnClickListener(v -> {
-            // TODO: Pass selected filter/sorting values back to HomeFragment
+            float min = priceSlider.getValues().get(0);
+            float max = priceSlider.getValues().get(1);
+            boolean frame = checkboxFrame.isChecked();
+            boolean sun = checkboxSunglasses.isChecked();
+
+            String sortBy = null;
+            int checkedId = sortingGroup.getCheckedRadioButtonId();
+            if (checkedId == R.id.sort_name_az) {
+                sortBy = "name_asc";
+            } else if (checkedId == R.id.sort_name_za) {
+                sortBy = "name_desc";
+            } else if (checkedId == R.id.sort_price_low) {
+                sortBy = "price_asc";
+            } else if (checkedId == R.id.sort_price_high) {
+                sortBy = "price_desc";
+            }
+
+            if (listener != null) {
+                listener.onFilterApplied(new ProductFilterSort(min, max, frame, sun, sortBy));
+            }
             dismiss();
         });
 

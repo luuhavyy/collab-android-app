@@ -68,7 +68,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:valueFrom="100000"
-                android:valueTo="100000000"
+                android:valueTo="1000000"
                 app:values="@array/default_range"
                 style="@style/Widget.App.RangeSlider.Custom" />
 
@@ -84,7 +84,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
-                android:text="VND 1.000.000.000" />
+                android:text="VND 1.000.000" />
 
             <CheckBox
                 android:id="@+id/checkbox_frame"

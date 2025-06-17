@@ -63,15 +63,6 @@ public class UserViewModel extends ViewModel {
         userRepository.updateUser(uid, updatedUser, onSuccess, onError);
     }
 
-    @Override
-    protected void onCleared() {
-        super.onCleared();
-        if (userListener != null) {
-            userRepository.removeUserListener(userListener);
-            userListener = null;
-        }
-    }
-
     public void updateProfilePicture(Context context, Uri imageUri, String userId, Runnable onSuccess, Runnable onError) {
         try {
             String base64 = null;
@@ -84,6 +75,15 @@ public class UserViewModel extends ViewModel {
 
         } catch (IOException e) {
             onError.run();
+        }
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        if (userListener != null) {
+            userRepository.removeUserListener(userListener);
+            userListener = null;
         }
     }
 }
