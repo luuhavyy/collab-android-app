@@ -350,35 +350,18 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        userConnector.getUserByUsername(username, new ValueEventListener() {
+        userConnector.getUserByEmail(email, new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    setFieldError(edtUsername, getString(R.string.error_username_exists));
+                    setFieldError(edtEmail, getString(R.string.error_email_exists));
                     showErrorDialog(getString(R.string.title_alert_register_header_fail),
-                            getString(R.string.error_username_exists));
+                            getString(R.string.error_email_exists));
                 } else {
-                    userConnector.getUserByEmail(email, new ValueEventListener() {
+                    getNextUserId(new UserCreationCallback() {
                         @Override
-                        public void onDataChange(DataSnapshot snapshot) {
-                            if (snapshot.exists()) {
-                                setFieldError(edtEmail, getString(R.string.error_email_exists));
-                                showErrorDialog(getString(R.string.title_alert_register_header_fail),
-                                        getString(R.string.error_email_exists));
-                            } else {
-                                getNextUserId(new UserCreationCallback() {
-                                    @Override
-                                    public void onUserIdGenerated(String userId) {
-                                        createNewUser(phoneNumber, fullName, username, email, gender, password, userId);
-                                    }
-                                });
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError error) {
-                            showErrorDialog(getString(R.string.title_alert_register_header_fail),
-                                    getString(R.string.error_database_connection));
+                        public void onUserIdGenerated(String userId) {
+                            createNewUser(phoneNumber, fullName, username, email, gender, password, userId);
                         }
                     });
                 }
@@ -419,7 +402,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void createNewUser(String phoneNumber, String fullName, String username,
-                               String email, String gender, String password, String userId) {
+                                String email, String gender, String password, String userId) {
         User newUser = new User();
         newUser.setPhonenumber(phoneNumber);
         newUser.setName(fullName);
@@ -435,19 +418,7 @@ public class RegisterActivity extends AppCompatActivity {
                         usersRef.child(userId).setValue(newUser)
                                 .addOnCompleteListener(dbTask -> {
                                     if (dbTask.isSuccessful()) {
-                                        userLookupRef.child(username.toLowerCase()).setValue(userId)
-                                                .addOnCompleteListener(lookupTask -> {
-                                                    if (lookupTask.isSuccessful()) {
-                                                        showSuccessDialog(newUser);
-                                                    } else {
-                                                        mAuth.getCurrentUser().delete();
-                                                        usersRef.child(userId).removeValue();
-                                                        showErrorDialog(
-                                                                "System Error",
-                                                                "Cannot create account. Please try again."
-                                                        );
-                                                    }
-                                                });
+                                        showSuccessDialog(newUser);
                                     } else {
                                         mAuth.getCurrentUser().delete();
                                         showErrorDialog(
@@ -474,7 +445,7 @@ public class RegisterActivity extends AppCompatActivity {
         builder.setIcon(R.mipmap.ic_success);
         builder.setMessage(res.getText(R.string.title_alert_register_header_success)+"\n"+ res.getText(R.string.title_alert_register_description));
         builder.setPositiveButton(res.getText(R.string.title_alert_register_continue), (dialog, which) -> {
-            Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+            Intent intent = new Intent(RegisterActivity.this, HomeActivity.class);
             intent.putExtra("USER_DATA", user);
             startActivity(intent);
             finish();

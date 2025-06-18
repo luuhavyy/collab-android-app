@@ -379,4 +379,8 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnQua
         });
     }
 
+    public void do_back(View view) {
+        Intent intent=new Intent(CartActivity.this, HomeActivity.class);
+        startActivity(intent);
+    }
 }
