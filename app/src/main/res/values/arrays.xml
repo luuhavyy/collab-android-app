@@ -2,6 +2,6 @@
 <resources>
     <array name="default_range">
         <item>100000</item>
-        <item>100000000</item>
+        <item>1000000</item>
     </array>
 </resources>
