@@ -1,5 +1,7 @@
 package com.luuhavyy.collabapp.connectors;
 
+import android.util.Log;
+
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.luuhavyy.collabapp.data.model.Order;
@@ -17,6 +19,11 @@ public class CheckoutConnector {
     }
 
     public void createOrder(Order order) {
-        databaseReference.child("orders").child(order.getOrderid()).setValue(order);
+        databaseReference.child("orders").child(order.getOrderid()).setValue(order)
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.e("CheckoutConnector", "Failed to create order", task.getException());
+                    }
+                });
     }
 }

@@ -181,6 +181,8 @@
     <string name="title_hint_phone_number">Phone Number</string>
     <string name="title_hint_fullname_checkout">Full Name</string>
     <string name="title_checkout_noti">Order Successful!</string>
+    <string name="quantity_format">Quantity: %d</string>
+    <string name="price_format">%1$,.0f ₫</string>
 
 
     <string name="products">Products</string>

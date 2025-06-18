@@ -78,6 +78,10 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnQua
         loadUserCart();
     }
 
+    private void setupAdapters() {
+        cartAdapter = new CartAdapter(this,cartItems, products, this);
+        lvProductCart.setAdapter(cartAdapter);
+    }
     private void initializeViews() {
         lvProductCart = findViewById(R.id.lvProductCart);
         txtTotalValue = findViewById(R.id.txtTotalValue);
@@ -91,10 +95,7 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnQua
     }
 
 
-    private void setupAdapters() {
-        cartAdapter = new CartAdapter(this,cartItems, products, this);
-        lvProductCart.setAdapter(cartAdapter);
-    }
+
 
     private void setupListeners() {
         imgVoucher.setOnClickListener(v -> openVoucherActivity());
