@@ -19,6 +19,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -215,17 +216,26 @@ public class LoginActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    // Thêm kiểm tra null trong saveLoginInformation()
     public void saveLoginInformation() {
         SharedPreferences preferences = getSharedPreferences("LOGIN_PREFERENCE", MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         String usr = edtUserName.getText().toString();
         String pwd = edtPassword.getText().toString();
         boolean isSave = chkSaveInfor.isChecked();
+
         editor.putString("USER_NAME", usr);
         editor.putString("PASSWORD", pwd);
-        editor.putString("FIREBASE_UID", mAuth.getCurrentUser().getUid());
         editor.putBoolean("SAVED", isSave);
-        editor.putBoolean("IS_LOGGED_IN", true);
+
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            editor.putString("FIREBASE_UID", currentUser.getUid());
+            editor.putBoolean("IS_LOGGED_IN", true);
+        } else {
+            editor.putBoolean("IS_LOGGED_IN", false);
+        }
+
         editor.apply();
     }
 

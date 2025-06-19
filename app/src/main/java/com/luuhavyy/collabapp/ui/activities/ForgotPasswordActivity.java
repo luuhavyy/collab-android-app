@@ -2,7 +2,6 @@ package com.luuhavyy.collabapp.ui.activities;
 
 import android.content.Intent;
 import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -15,19 +14,22 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.luuhavyy.collabapp.ui.activities.LoginActivity;
 import com.luuhavyy.collabapp.R;
 import com.luuhavyy.collabapp.connectors.UserConnector;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ForgotPasswordActivity extends AppCompatActivity {
     private EditText edtPhoneNumber;
@@ -35,6 +37,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     private LinearLayout mainLayout;
     private UserConnector userConnector;
     private String currentVerificationCode = "1234"; // Default code
+    private DatabaseReference databaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +51,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         });
 
         userConnector = new UserConnector();
+        databaseReference = FirebaseDatabase.getInstance().getReference();
         addViews();
         setupListeners();
     }
@@ -74,9 +78,9 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                 return;
             }
 
-            userConnector.getUserByPhoneNumber(finalNormalizedPhone, new com.google.firebase.database.ValueEventListener() {
+            userConnector.getUserByPhoneNumber(finalNormalizedPhone, new ValueEventListener() {
                 @Override
-                public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                public void onDataChange(DataSnapshot snapshot) {
                     if (snapshot.exists()) {
                         showVerificationScreen(phoneNumber);
                     } else {
@@ -115,13 +119,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         txtPhoneNumber.setText(getString(R.string.verify_phone_message, phoneNumber));
 
         TextView txtChangePhone = verificationView.findViewById(R.id.txtChangePhone);
-        txtChangePhone.setOnClickListener(v -> {
-            mainLayout.removeAllViews();
-            View forgotPasswordView = getLayoutInflater().inflate(R.layout.activity_forgot_password, mainLayout, false);
-            mainLayout.addView(forgotPasswordView);
-            addViews();
-            setupListeners();
-        });
+        txtChangePhone.setOnClickListener(v -> recreate());
 
         TextView txtResend = verificationView.findViewById(R.id.textView12);
         txtResend.setOnClickListener(v -> {
@@ -135,11 +133,6 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         EditText edtLast = verificationView.findViewById(R.id.edtLastNumber);
         Button btnContinue = verificationView.findViewById(R.id.btnContinue);
 
-        edtFirst.setText("1");
-        edtSecond.setText("2");
-        edtThird.setText("3");
-        edtLast.setText("4");
-
         TextWatcher watcher = new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -150,7 +143,6 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                 btnContinue.setBackgroundTintList(ColorStateList.valueOf(
                         allFilled ? getResources().getColor(R.color.green_button)
                                 : getResources().getColor(R.color.gray_button)));
-
             }
             @Override public void afterTextChanged(Editable s) {}
         };
@@ -188,27 +180,19 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         Button btnSave = updatePasswordView.findViewById(R.id.button);
 
         TextWatcher watcher = new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
                 boolean bothFilled = !edtNew.getText().toString().isEmpty() &&
                         !edtConfirm.getText().toString().isEmpty();
                 btnSave.setBackgroundTintList(ColorStateList.valueOf(
                         bothFilled ? getResources().getColor(R.color.green_button)
                                 : getResources().getColor(R.color.gray_button)));
             }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
+            @Override public void afterTextChanged(Editable s) {}
         };
 
         edtNew.addTextChangedListener(watcher);
         edtConfirm.addTextChangedListener(watcher);
-
 
         btnSave.setOnClickListener(v -> {
             String newPass = edtNew.getText().toString();
@@ -224,89 +208,133 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                 return;
             }
 
-            final String normalizedPhone = normalizePhoneNumber(phoneNumber);
-
-            userConnector.getUserByPhoneNumber(normalizedPhone, new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot snapshot) {
-                    if (snapshot.exists()) {
-                        for (DataSnapshot userSnapshot : snapshot.getChildren()) {
-                            String email = userSnapshot.child("email").getValue(String.class);
-                            String userId = userSnapshot.getKey();
-
-                            if (email != null && userId != null) {
-                                // First update password in Firebase Authentication
-                                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                                if (user != null && user.getEmail().equals(email)) {
-                                    // User is logged in - update directly
-                                    user.updatePassword(newPass)
-                                            .addOnCompleteListener(authTask -> {
-                                                if (authTask.isSuccessful()) {
-                                                    // Then update in database
-                                                    userConnector.updateUserPassword(userId, newPass)
-                                                            .addOnCompleteListener(dbTask -> {
-                                                                if (dbTask.isSuccessful()) {
-                                                                    Toast.makeText(ForgotPasswordActivity.this,
-                                                                            "Password updated successfully!",
-                                                                            Toast.LENGTH_SHORT).show();
-                                                                    finish();
-                                                                } else {
-                                                                    Toast.makeText(ForgotPasswordActivity.this,
-                                                                            "Database update failed: " +
-                                                                                    dbTask.getException().getMessage(),
-                                                                            Toast.LENGTH_SHORT).show();
-                                                                }
-                                                            });
-                                                } else {
-                                                    Toast.makeText(ForgotPasswordActivity.this,
-                                                            "Authentication update failed: " +
-                                                                    authTask.getException().getMessage(),
-                                                            Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
-                                } else {
-                                    // User not logged in - use email link AND update database
-                                    FirebaseAuth.getInstance().sendPasswordResetEmail(email)
-                                            .addOnCompleteListener(emailTask -> {
-                                                if (emailTask.isSuccessful()) {
-                                                    // Update in database
-                                                    userConnector.updateUserPassword(userId, newPass)
-                                                            .addOnCompleteListener(dbTask -> {
-                                                                if (dbTask.isSuccessful()) {
-                                                                    Toast.makeText(ForgotPasswordActivity.this,
-                                                                            "Password reset email sent and database updated!",
-                                                                            Toast.LENGTH_SHORT).show();
-                                                                    finish();
-                                                                } else {
-                                                                    Toast.makeText(ForgotPasswordActivity.this,
-                                                                            "Email sent but database update failed: " +
-                                                                                    dbTask.getException().getMessage(),
-                                                                            Toast.LENGTH_SHORT).show();
-                                                                }
-                                                            });
-                                                } else {
-                                                    Toast.makeText(ForgotPasswordActivity.this,
-                                                            "Failed to send reset email: " +
-                                                                    emailTask.getException().getMessage(),
-                                                            Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
-                                }
-                            }
-                        }
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError error) {
-                    Toast.makeText(ForgotPasswordActivity.this,
-                            "Database error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-                    Log.e("PasswordReset", "Database error", error.toException());
-                }
-            });
+            resetPasswordWithPhoneNumber(phoneNumber, newPass);
         });
     }
+
+    private void resetPasswordWithPhoneNumber(String phoneNumber, String newPassword) {
+        final String normalizedPhone = normalizePhoneNumber(phoneNumber);
+
+        databaseReference.child("users").orderByChild("phonenumber").equalTo(normalizedPhone)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                                String userId = userSnapshot.getKey();
+                                String userEmail = userSnapshot.child("email").getValue(String.class);
+
+                                // Tạo token reset (sử dụng newPassword làm token để đơn giản)
+                                String resetToken = newPassword; // Sử dụng mật khẩu mới làm token
+                                DatabaseReference tokenRef = databaseReference
+                                        .child("passwordResetTokens")
+                                        .child(userId)
+                                        .child(resetToken);
+
+                                // Bước 1: Tạo token trước
+                                tokenRef.setValue(true).addOnCompleteListener(tokenTask -> {
+                                    if (tokenTask.isSuccessful()) {
+                                        // Bước 2: Cập nhật mật khẩu trong Database
+                                        DatabaseReference userRef = databaseReference
+                                                .child("users")
+                                                .child(userId)
+                                                .child("password");
+
+                                        userRef.setValue(newPassword).addOnCompleteListener(passTask -> {
+                                            // Bước 3: Xóa token sau khi dùng
+                                            tokenRef.removeValue();
+
+                                            if (passTask.isSuccessful()) {
+                                                // Bước 4: Cập nhật Firebase Auth
+                                                updateFirebaseAuthPassword(userEmail, newPassword, userEmail);
+                                            } else {
+                                                Toast.makeText(ForgotPasswordActivity.this,
+                                                        "Failed to update database password: " + passTask.getException().getMessage(),
+                                                        Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    } else {
+                                        Toast.makeText(ForgotPasswordActivity.this,
+                                                "Failed to create reset token",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        } else {
+                            Toast.makeText(ForgotPasswordActivity.this,
+                                    "User not found", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(ForgotPasswordActivity.this,
+                                "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    // Thêm phương thức mới để cập nhật Firebase Auth
+    private void updateFirebaseAuthPassword(String email, String newPassword, String userEmailForSuccessHandler) {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+
+        // Gửi yêu cầu reset mật khẩu qua email (bắt buộc để Firebase Auth cho phép thay đổi mật khẩu)
+        auth.sendPasswordResetEmail(email)
+                .addOnCompleteListener(resetTask -> {
+                    if (resetTask.isSuccessful()) {
+                        // Sau khi gửi email reset thành công, đăng nhập bằng mật khẩu cũ (nếu có)
+                        // Lưu ý: Đoạn này giả định người dùng đã click vào link reset trong email
+                        // Trong thực tế cần có flow phức tạp hơn
+
+                        // Đăng nhập bằng email và mật khẩu mới để cập nhật Firebase Auth
+                        auth.signInWithEmailAndPassword(email, newPassword)
+                                .addOnCompleteListener(loginTask -> {
+                                    if (loginTask.isSuccessful()) {
+                                        handlePasswordUpdateSuccess(userEmailForSuccessHandler);
+                                    } else {
+                                        Toast.makeText(ForgotPasswordActivity.this,
+                                                "Database password updated but failed to update Firebase Auth: " + loginTask.getException().getMessage(),
+                                                Toast.LENGTH_SHORT).show();
+                                        goToLoginScreen();
+                                    }
+                                });
+                    } else {
+                        Toast.makeText(ForgotPasswordActivity.this,
+                                "Database password updated but failed to update Firebase Auth: " + resetTask.getException().getMessage(),
+                                Toast.LENGTH_SHORT).show();
+                        goToLoginScreen();
+                    }
+                });
+    }
+
+    private void handlePasswordUpdateSuccess(String userEmail) {
+        if (userEmail != null && !userEmail.isEmpty()) {
+            FirebaseAuth.getInstance().sendPasswordResetEmail(userEmail)
+                    .addOnCompleteListener(emailTask -> {
+                        String message = emailTask.isSuccessful()
+                                ? "Password changed! Check your email."
+                                : "Password changed but failed to send email";
+                        Toast.makeText(ForgotPasswordActivity.this, message, Toast.LENGTH_SHORT).show();
+                        goToLoginScreen();
+                    });
+        } else {
+            Toast.makeText(ForgotPasswordActivity.this,
+                    "Password changed successfully!",
+                    Toast.LENGTH_SHORT).show();
+            goToLoginScreen();
+        }
+    }
+
+    private String generateRandomToken() {
+        return String.format("%06d", (int)(Math.random() * 1000000));
+    }
+
+    private void goToLoginScreen() {
+        startActivity(new Intent(ForgotPasswordActivity.this, LoginActivity.class));
+        finish();
+    }
+
     public void do_back_login(View view) {
         startActivity(new Intent(this, LoginActivity.class));
     }
-};
+}
