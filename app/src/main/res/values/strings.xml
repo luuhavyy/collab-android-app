@@ -152,6 +152,39 @@
     <string name="login">Login</string>
     <string name="please_login_for_better_experience">Please Login for better experience</string>
     <string name="username_login_register_via_email">Username login/ register via email</string>
+ 
+    <string name="error_calculating_total">Total calculation error</string>
+    <string name="calculating">Calculating...</string>
+
+    <string name="database_error">Database error: </string>
+    <string name="voucher_not_for_products">Voucher is not applicable for these products</string>
+    <string name="title_checkout_header">CHECKOUT</string>
+    <string name="title_checkout_personal_infor">Personal Information</string>
+    <string name="title_checkout_payment_method">Payment Method</string>
+    <string name="title_checkout_order_items">Your items</string>
+    <string name="title_checkout_subtotal">Subtotal</string>
+    <string name="title_checkout_discount">Discount</string>
+    <string name="title_checkout_delivery">Delivery Fee</string>
+    <string name="title_checkout_total">Total</string>
+    <string name="title_banking_infor">Banking Information</string>
+    <string name="title_hint_pin_banking">PIN</string>
+    <string name="title_banking_card_name">Cardholder\'s Name</string>
+    <string name="title_personal_infor_edit">Edit</string>
+    <string name="title_checkout_notification">Notification</string>
+    <string name="title_checkout_noti_total_payment">You pay</string>
+    <string name="title_checkout_continue">Continue to shop</string>
+    <string name="title_checkout_back">Back to Homepage</string>
+    <string name="title_payment_method_COD">Cash on Delivery</string>
+    <string name="title_payment_method_VISA">VISA/MASTERCARD</string>
+    <string name="title_hint_address">Address\n</string>
+    <string name="title_hint_email_checkout">Email</string>
+    <string name="title_hint_phone_number">Phone Number</string>
+    <string name="title_hint_fullname_checkout">Full Name</string>
+    <string name="title_checkout_noti">Order Successful!</string>
+    <string name="quantity_format">Quantity: %d</string>
+    <string name="price_format">%1$,.0f ₫</string>
+
+
     <string name="products">Products</string>
     <string name="sunglasses">Sunglasses</string>
     <string name="categories">Categories</string>

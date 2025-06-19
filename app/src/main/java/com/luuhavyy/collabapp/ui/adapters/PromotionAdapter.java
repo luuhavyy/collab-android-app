@@ -55,11 +55,12 @@ public class PromotionAdapter extends BaseAdapter {
         if ("percentage".equals(promotion.getDiscounttype())) {
             txtDiscountType.setText(promotion.getDiscountvalue() + "%");
         } else {
-            txtDiscountType.setText(String.format("%,d VNĐ", promotion.getDiscountvalue()));
+            txtDiscountType.setText(String.format("%,d VNĐ", (long)promotion.getDiscountvalue()));
         }
 
-        // Set discount info
-        if (promotion.getUserid() != null && !promotion.getUserid().isEmpty()) {
+        // Set discount info - FIXED VERSION
+        String userId = promotion.getUserid();
+        if (userId != null && !userId.isEmpty()) {
             txtDiscountInfor.setText("Voucher is only for you");
         } else {
             txtDiscountInfor.setText("");
@@ -73,7 +74,6 @@ public class PromotionAdapter extends BaseAdapter {
 
         return convertView;
     }
-
     public Promotion getSelectedPromotion() {
         if (selectedPosition != -1) {
             return promotions.get(selectedPosition);
