@@ -153,14 +153,18 @@
         android:gravity="center"
         android:orientation="horizontal">
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_reset"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/reset" />
+            android:text="@string/reset"
+            android:textColor="@color/deep_green"
+            android:background="@drawable/bg_button_outline"
+            app:backgroundTint="@null"
+            app:strokeWidth="2dp"/>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_apply"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -168,6 +172,8 @@
             android:layout_weight="1"
             android:backgroundTint="@color/deep_green"
             android:text="@string/apply"
+            android:background="@drawable/bg_button_rounded"
+            app:backgroundTint="@null"
             android:textColor="@android:color/white" />
     </LinearLayout>
 </LinearLayout>

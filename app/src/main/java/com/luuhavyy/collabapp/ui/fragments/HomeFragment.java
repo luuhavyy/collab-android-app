@@ -66,7 +66,7 @@ public class HomeFragment extends Fragment {
 
         productViewModel.getProductsLiveData().observe(getViewLifecycleOwner(), products -> {
             if (products != null) {
-                recyclerView.setAdapter(new ProductAdapter(products));
+                recyclerView.setAdapter(new ProductAdapter(requireContext(), products));
             } else {
                 Toast.makeText(requireContext(), "Error loading products", Toast.LENGTH_SHORT).show();
             }

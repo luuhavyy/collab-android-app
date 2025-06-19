@@ -44,4 +44,9 @@
         <item name="trackColorInactive">@color/light_gray</item>
         <item name="haloColor">@android:color/transparent</item>
     </style>
+
+    <style name="YellowRatingBar" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorControlActivated">#FFD600</item>
+        <item name="colorControlNormal">#CCCCCC</item>
+    </style>
 </resources>

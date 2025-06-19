@@ -31,4 +31,8 @@ public class ProductRepository {
                 .endAt(keyword + "\uf8ff")
                 .addListenerForSingleValueEvent(listener);
     }
+
+    public void fetchProductById(String productId, ValueEventListener listener) {
+        productRef.child(productId).addListenerForSingleValueEvent(listener);
+    }
 }
