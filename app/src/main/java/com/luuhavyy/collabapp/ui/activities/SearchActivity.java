@@ -48,7 +48,7 @@ public class SearchActivity extends AppCompatActivity {
         layoutNoProduct = findViewById(R.id.layout_no_product);
 
         productViewModel = new ViewModelProvider(this).get(ProductViewModel.class);
-        productAdapter = new ProductAdapter(new ArrayList<>());
+        productAdapter = new ProductAdapter(SearchActivity.this, new ArrayList<>());
         recyclerProducts.setLayoutManager(new GridLayoutManager(this, 2));
         recyclerProducts.setAdapter(productAdapter);
 

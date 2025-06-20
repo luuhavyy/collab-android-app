@@ -1,5 +1,7 @@
 package com.luuhavyy.collabapp.ui.adapters;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.luuhavyy.collabapp.R;
 import com.luuhavyy.collabapp.data.model.Product;
+import com.luuhavyy.collabapp.ui.activities.ProductDetailActivity;
 import com.luuhavyy.collabapp.utils.ImageUtil;
 
 import java.util.ArrayList;
@@ -19,8 +22,10 @@ import java.util.List;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
     private List<Product> products;
+    private Context context;
 
-    public ProductAdapter(List<Product> products) {
+    public ProductAdapter(Context context, List<Product> products) {
+        this.context = context;
         this.products = products != null ? products : new ArrayList<>();
     }
 
@@ -50,7 +55,14 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         holder.tvName.setText(p.getName());
         holder.tvPrice.setText("VND. " + p.getPrice());
         holder.tvRating.setText("⭐ " + p.getRatings() + "   " + 0 + " Reviews");
+
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, ProductDetailActivity.class);
+            intent.putExtra("product_id", p.getProductid());
+            context.startActivity(intent);
+        });
     }
+
 
     @Override
     public int getItemCount() {

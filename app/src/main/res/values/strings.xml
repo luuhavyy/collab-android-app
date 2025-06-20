@@ -200,4 +200,10 @@
     <string name="frame_glasses">Frame-glasses</string>
     <string name="range_harga">Range Harga</string>
     <string name="search">Search</string>
+    <string name="share">Share</string>
+    <string name="see_all_review">See All Review</string>
+    <string name="see_all">See All</string>
+    <string name="add_to_cart">Add to Cart</string>
+    <string name="buy_now">Buy Now</string>
+    <string name="relevant_product">Relevant Product</string>
 </resources>

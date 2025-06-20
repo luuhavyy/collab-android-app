@@ -1,6 +1,7 @@
 package com.luuhavyy.collabapp.ui.viewmodels;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -9,21 +10,102 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.luuhavyy.collabapp.data.model.Product;
 import com.luuhavyy.collabapp.data.model.ProductFilterSort;
+import com.luuhavyy.collabapp.data.model.Review;
+import com.luuhavyy.collabapp.data.model.ReviewWithUser;
+import com.luuhavyy.collabapp.data.model.User;
 import com.luuhavyy.collabapp.data.repository.ProductRepository;
+import com.luuhavyy.collabapp.data.repository.ReviewRepository;
+import com.luuhavyy.collabapp.data.repository.UserRepository;
 import com.luuhavyy.collabapp.utils.LoadingHandlerUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import lombok.Getter;
 
 public class ProductViewModel extends ViewModel {
     private final ProductRepository repository = new ProductRepository();
+    private final UserRepository userRepository = new UserRepository();
+
     @Getter
     private final MutableLiveData<List<Product>> productsLiveData = new MutableLiveData<>();
     private ValueEventListener productListener;
+    private final MutableLiveData<Product> productLiveData = new MutableLiveData<>();
+    private final MutableLiveData<List<Review>> reviewListLiveData = new MutableLiveData<>();
+    private final ReviewRepository reviewRepository = new ReviewRepository();
+    public LiveData<Product> getProductLiveData() {
+        return productLiveData;
+    }
+    public LiveData<List<Review>> getReviewListLiveData() {
+        return reviewListLiveData;
+    }
+    private final MutableLiveData<List<ReviewWithUser>> reviewWithUserLiveData = new MutableLiveData<>();
+    public LiveData<List<ReviewWithUser>> getReviewWithUserLiveData() { return reviewWithUserLiveData; }
+
+
+    public void fetchReviewsWithUser(String productId) {
+        reviewRepository.getReviewsByProductId(productId, new ReviewRepository.ReviewCallback() {
+            @Override
+            public void onReviewsLoaded(List<Review> reviews) {
+                if (reviews == null || reviews.isEmpty()) {
+                    reviewWithUserLiveData.postValue(Collections.emptyList());
+                    return;
+                }
+                Set<String> userIds = new HashSet<>();
+                for (Review r : reviews) userIds.add(r.getUserid());
+
+                // Map userId -> User
+                Map<String, User> userMap = new HashMap<>();
+                // Dùng CountDownLatch để biết khi nào lấy xong hết user
+                final int total = userIds.size();
+                final int[] count = {0};
+
+                for (String userId : userIds) {
+                    userRepository.getUserById(userId, new UserRepository.UserCallback() {
+                        @Override
+                        public void onUserLoaded(User user) {
+                            userMap.put(userId, user);
+                            count[0]++;
+                            if (count[0] == total) {
+                                // Đã lấy xong tất cả user
+                                List<ReviewWithUser> reviewWithUserList = new ArrayList<>();
+                                for (Review review : reviews) {
+                                    User u = userMap.get(review.getUserid());
+                                    reviewWithUserList.add(new ReviewWithUser(review, u));
+                                }
+                                reviewWithUserLiveData.postValue(reviewWithUserList);
+                            }
+                        }
+                        @Override
+                        public void onError(String error) {
+                            // Lấy user lỗi, vẫn tăng count
+                            count[0]++;
+                            if (count[0] == total) {
+                                List<ReviewWithUser> reviewWithUserList = new ArrayList<>();
+                                for (Review review : reviews) {
+                                    User u = userMap.get(review.getUserid());
+                                    reviewWithUserList.add(new ReviewWithUser(review, u));
+                                }
+                                reviewWithUserLiveData.postValue(reviewWithUserList);
+                            }
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onError(String error) {
+                // Có thể postValue rỗng hoặc báo lỗi
+                reviewWithUserLiveData.postValue(Collections.emptyList());
+            }
+        });
+    }
 
     public void listenToProductsRealtime(LoadingHandlerUtil.TaskCallback callback) {
         if (productListener != null) {
@@ -133,6 +215,35 @@ public class ProductViewModel extends ViewModel {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 callback.onComplete();
+            }
+        });
+    }
+
+    public void fetchProductDetail(String productId, LoadingHandlerUtil.TaskCallback callback) {
+        repository.fetchProductById(productId, new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Product product = snapshot.getValue(Product.class);
+                productLiveData.setValue(product);
+                callback.onComplete();
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                productLiveData.setValue(null);
+                callback.onComplete();
+            }
+        });
+    }
+
+    public void fetchReviewsByProductId(String productId) {
+        reviewRepository.getReviewsByProductId(productId, new ReviewRepository.ReviewCallback() {
+            @Override
+            public void onReviewsLoaded(List<Review> reviews) {
+                reviewListLiveData.postValue(reviews);
+            }
+            @Override
+            public void onError(String error) {
+                // Có thể log lỗi hoặc show Toast
             }
         });
     }
