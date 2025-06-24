@@ -45,10 +45,13 @@ public class HomeActivity extends AppCompatActivity {
                 return true;
             } else if (itemId == R.id.nav_noti) {
                 navController.navigate(R.id.nav_noti);
-                return true;
+                AuthUtil.checkLoginAndRedirect(this,
+                        () -> navController.navigate(R.id.nav_noti));
+                return AuthUtil.isLoggedIn();
             } else if (itemId == R.id.nav_order) {
-                navController.navigate(R.id.nav_order);
-                return true;
+                AuthUtil.checkLoginAndRedirect(this,
+                        () -> navController.navigate(R.id.nav_order));
+                return AuthUtil.isLoggedIn();
             } else if (itemId == R.id.nav_profile) {
                 AuthUtil.checkLoginAndRedirect(this,
                         () -> navController.navigate(R.id.nav_profile));

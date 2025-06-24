@@ -43,6 +43,8 @@
         <activity android:name=".ui.activities.EditInformationActivity" />
         <activity android:name=".ui.activities.SearchActivity"/>
         <activity android:name=".ui.activities.ProductDetailActivity"/>
+        <activity android:name=".ui.activities.OrderDetailActivity" />
+        <activity android:name=".ui.activities.ReviewProductActivity"/>
 
 
         <!-- Meta-data -->
