@@ -27,7 +27,6 @@ import java.util.List;
 
 public class OrderDetailActivity extends AppCompatActivity {
     private OrderDetailViewModel viewModel;
-    // View binding hoặc findViewById
     private TextView tvStatus, tvOrderId, tvUserName, tvUserEmail, tvUserAddress, tvUserPhone, tvShippingDate, tvShippingAddress, tvPaymentMethod, tvTotalPaid;
     private LinearLayout layoutItems;
     private Button btnMoreProducts, btnBackHome;
@@ -152,9 +151,12 @@ public class OrderDetailActivity extends AppCompatActivity {
         // 4. Trigger fetch dữ liệu
         viewModel.fetchOrderById(orderId);
 
-        btnBackHome.setOnClickListener(v -> finish());
+        btnBackHome.setOnClickListener(v -> {
+            Intent intent = new Intent(OrderDetailActivity.this, HomeActivity.class);
+            startActivity(intent);
+        });
         btnMoreProducts.setOnClickListener(v -> {
-            Intent intent = new Intent(OrderDetailActivity.this, CartActivity.class); // Hoặc ProductListActivity
+            Intent intent = new Intent(OrderDetailActivity.this, CartActivity.class);
             startActivity(intent);
         });
     }
