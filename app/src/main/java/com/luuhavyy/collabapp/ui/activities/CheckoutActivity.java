@@ -147,6 +147,25 @@ public class CheckoutActivity extends AppCompatActivity {
 
         databaseReference = FirebaseDatabase.getInstance().getReference();
         firebaseAuth = FirebaseAuth.getInstance();
+
+        // Re-set payment method if it was previously selected
+        if (paymentMethod != null) {
+            if (paymentMethod.equals("VISA")) {
+                radioVisa.setChecked(true);
+                radioVisa.setTextColor(Color.parseColor("#129D12"));
+                radioCOD.setTextColor(Color.BLACK);
+            } else if (paymentMethod.equals("COD")) {
+                radioCOD.setChecked(true);
+                radioCOD.setTextColor(Color.parseColor("#129D12"));
+                radioVisa.setTextColor(Color.BLACK);
+            }
+        }
+
+        // Restore the adapter if we have data
+        if (checkoutAdapter == null && !selectedCartItems.isEmpty() && !selectedProducts.isEmpty()) {
+            checkoutAdapter = new CheckoutAdapter(this, selectedCartItems, selectedProducts);
+            listOrderItems.setAdapter(checkoutAdapter);
+        }
     }
 
     private void setupListeners() {
@@ -194,9 +213,17 @@ public class CheckoutActivity extends AppCompatActivity {
             }
         });
         // Banking info layout listeners
-        txtEditPersonalInfor.setOnClickListener(v -> switchToMainLayout());
-        txtEdit.setOnClickListener(v -> switchToMainLayout());
-        bankingInfoLayout.findViewById(R.id.imageView2).setOnClickListener(v -> switchToMainLayout());
+        // Banking info layout listeners
+        txtEditPersonalInfor.setOnClickListener(v -> {
+            switchToMainLayout();
+            validateForm(); // Ensure form validation is triggered
+        });
+
+        txtEdit.setOnClickListener(v -> {
+            switchToMainLayout();
+            validateForm(); // Ensure form validation is triggered
+        });
+
 
         /// Banking info continue button
         bankingInfoLayout.findViewById(R.id.btnContinue).setOnClickListener(v -> {
@@ -212,8 +239,8 @@ public class CheckoutActivity extends AppCompatActivity {
         });
 
         btnHomepage.setOnClickListener(v -> {
-            // Go to homepage logic
-            finish();
+            Intent intent=new Intent(CheckoutActivity.this, HomeActivity.class);
+            startActivity(intent);
         });
 
         // Add text watchers for banking info fields
@@ -246,11 +273,24 @@ public class CheckoutActivity extends AppCompatActivity {
 
     private void switchToMainLayout() {
         mainLayout.removeAllViews();
-        setContentView(R.layout.activity_checkout);
+        View mainView = LayoutInflater.from(this).inflate(R.layout.activity_checkout, mainLayout, false);
+        mainLayout.addView(mainView);
+
+        // Reinitialize views with the new layout
         initializeViews();
-        setupListeners();
+
+        // Restore the adapter and data
+        if (checkoutAdapter == null && !selectedCartItems.isEmpty()) {
+            checkoutAdapter = new CheckoutAdapter(this, selectedCartItems, selectedProducts);
+        }
+
+        if (listOrderItems != null && checkoutAdapter != null) {
+            listOrderItems.setAdapter(checkoutAdapter);
+        }
+
         populateUserInformation();
         calculateOrderSummary();
+        setupListeners();
     }
 
     private void switchToBankingInfoLayout() {
@@ -527,11 +567,17 @@ public class CheckoutActivity extends AppCompatActivity {
         }
     }
 
+//    private void setupOrderItemsList() {
+//        checkoutAdapter = new CheckoutAdapter(this, selectedCartItems, selectedProducts);
+//        listOrderItems.setAdapter(checkoutAdapter);
+//    }
     private void setupOrderItemsList() {
-        checkoutAdapter = new CheckoutAdapter(this, selectedCartItems, selectedProducts);
-        listOrderItems.setAdapter(checkoutAdapter);
+        if (selectedCartItems != null && selectedProducts != null &&
+                selectedCartItems.size() == selectedProducts.size()) {
+            checkoutAdapter = new CheckoutAdapter(this, selectedCartItems, selectedProducts);
+            listOrderItems.setAdapter(checkoutAdapter);
+        }
     }
-
     private void calculateOrderSummary() {
         // Calculate subtotal
         subtotal = 0;
