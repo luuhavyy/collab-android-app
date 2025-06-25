@@ -32,7 +32,6 @@ import lombok.Getter;
 public class ProductViewModel extends ViewModel {
     private final ProductRepository repository = new ProductRepository();
     private final UserRepository userRepository = new UserRepository();
-
     @Getter
     private final MutableLiveData<List<Product>> productsLiveData = new MutableLiveData<>();
     private ValueEventListener productListener;
@@ -141,8 +140,8 @@ public class ProductViewModel extends ViewModel {
 
     public void fetchProductsWithFilter(ProductFilterSort filterSort, final LoadingHandlerUtil.TaskCallback callback) {
         if (productListener != null) {
-            callback.onComplete();
-            return;
+            repository.removeProductListener(productListener);
+            productListener = null;
         }
 
         repository.fetchProductsWithFilter(filterSort, new ValueEventListener() {
