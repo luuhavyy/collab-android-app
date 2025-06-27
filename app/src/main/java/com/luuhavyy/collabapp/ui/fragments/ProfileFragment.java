@@ -32,6 +32,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.luuhavyy.collabapp.R;
 import com.luuhavyy.collabapp.data.model.User;
 import com.luuhavyy.collabapp.ui.activities.EditInformationActivity;
+import com.luuhavyy.collabapp.ui.activities.PolicyActivity;
 import com.luuhavyy.collabapp.ui.dialogs.ErrorDialog;
 import com.luuhavyy.collabapp.ui.dialogs.ProfilePictureDialogFragment;
 import com.luuhavyy.collabapp.ui.viewmodels.UserViewModel;
@@ -134,6 +135,8 @@ public class ProfileFragment extends Fragment {
     private void handleMenuClick(int index) {
         if (index == 0) {
             startActivity(new Intent(getActivity(), EditInformationActivity.class));
+        } else if (index == 3) { // Index của Policy
+            startActivity(new Intent(getActivity(), PolicyActivity.class));
         }
         // Add more item here
     }

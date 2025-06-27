@@ -45,6 +45,7 @@
         <activity android:name=".ui.activities.ProductDetailActivity"/>
         <activity android:name=".ui.activities.OrderDetailActivity" />
         <activity android:name=".ui.activities.ReviewProductActivity"/>
+        <activity android:name=".ui.activities.PolicyActivity"/>
 
 
         <!-- Meta-data -->
