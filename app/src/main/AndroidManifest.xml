@@ -35,7 +35,16 @@
 
         <!-- Internal/non-exported activities -->
         <activity android:name=".ui.activities.RegisterActivity" android:exported="false" />
-        <activity android:name=".ui.activities.ForgotPasswordActivity" android:exported="false" />
+        <activity
+            android:name=".ui.activities.ForgotPasswordActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:host="yourdomain.com" android:scheme="https" />
+            </intent-filter>
+        </activity>
         <activity android:name=".ui.activities.CheckoutActivity" android:exported="false" />
         <activity android:name=".ui.activities.CartActivity" android:exported="false" />
         <activity android:name=".ui.activities.VoucherActivity" android:exported="false" />
