@@ -38,6 +38,9 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     private UserConnector userConnector;
     private String currentVerificationCode = "1234"; // Default code
     private DatabaseReference databaseReference;
+    private String tempNewPassword = "";
+    private String tempUserId = "";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,13 +51,16 @@ public class ForgotPasswordActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+            
         });
-
+        handlePasswordResetLink(getIntent());
         userConnector = new UserConnector();
         databaseReference = FirebaseDatabase.getInstance().getReference();
         addViews();
         setupListeners();
+        
     }
+
 
     private void addViews() {
         btnReset = findViewById(R.id.btnRegister);
@@ -224,41 +230,17 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                                 String userId = userSnapshot.getKey();
                                 String userEmail = userSnapshot.child("email").getValue(String.class);
 
-                                // Tạo token reset (sử dụng newPassword làm token để đơn giản)
-                                String resetToken = newPassword; // Sử dụng mật khẩu mới làm token
-                                DatabaseReference tokenRef = databaseReference
-                                        .child("passwordResetTokens")
-                                        .child(userId)
-                                        .child(resetToken);
+                                if (userEmail != null && !userEmail.isEmpty()) {
+                                    // Lưu mật khẩu mới tạm thời
+                                    tempNewPassword = newPassword;
+                                    tempUserId = userId;
 
-                                // Bước 1: Tạo token trước
-                                tokenRef.setValue(true).addOnCompleteListener(tokenTask -> {
-                                    if (tokenTask.isSuccessful()) {
-                                        // Bước 2: Cập nhật mật khẩu trong Database
-                                        DatabaseReference userRef = databaseReference
-                                                .child("users")
-                                                .child(userId)
-                                                .child("password");
-
-                                        userRef.setValue(newPassword).addOnCompleteListener(passTask -> {
-                                            // Bước 3: Xóa token sau khi dùng
-                                            tokenRef.removeValue();
-
-                                            if (passTask.isSuccessful()) {
-                                                // Bước 4: Cập nhật Firebase Auth
-                                                updateFirebaseAuthPassword(userEmail, newPassword, userEmail);
-                                            } else {
-                                                Toast.makeText(ForgotPasswordActivity.this,
-                                                        "Failed to update database password: " + passTask.getException().getMessage(),
-                                                        Toast.LENGTH_SHORT).show();
-                                            }
-                                        });
-                                    } else {
-                                        Toast.makeText(ForgotPasswordActivity.this,
-                                                "Failed to create reset token",
-                                                Toast.LENGTH_SHORT).show();
-                                    }
-                                });
+                                    // Gửi email reset mật khẩu
+                                    sendPasswordResetEmail(userEmail);
+                                } else {
+                                    Toast.makeText(ForgotPasswordActivity.this,
+                                            "User email not found", Toast.LENGTH_SHORT).show();
+                                }
                             }
                         } else {
                             Toast.makeText(ForgotPasswordActivity.this,
@@ -274,38 +256,141 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                 });
     }
 
-    // Thêm phương thức mới để cập nhật Firebase Auth
-    private void updateFirebaseAuthPassword(String email, String newPassword, String userEmailForSuccessHandler) {
+    private void sendPasswordResetEmail(String email) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
 
-        // Gửi yêu cầu reset mật khẩu qua email (bắt buộc để Firebase Auth cho phép thay đổi mật khẩu)
         auth.sendPasswordResetEmail(email)
-                .addOnCompleteListener(resetTask -> {
-                    if (resetTask.isSuccessful()) {
-                        // Sau khi gửi email reset thành công, đăng nhập bằng mật khẩu cũ (nếu có)
-                        // Lưu ý: Đoạn này giả định người dùng đã click vào link reset trong email
-                        // Trong thực tế cần có flow phức tạp hơn
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(ForgotPasswordActivity.this,
+                                "Reset email sent. Please check your email to complete the process.",
+                                Toast.LENGTH_LONG).show();
+                        goToLoginScreen();
+                    } else {
+                        Toast.makeText(ForgotPasswordActivity.this,
+                                "Failed to send reset email: " + task.getException().getMessage(),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
 
-                        // Đăng nhập bằng email và mật khẩu mới để cập nhật Firebase Auth
-                        auth.signInWithEmailAndPassword(email, newPassword)
-                                .addOnCompleteListener(loginTask -> {
-                                    if (loginTask.isSuccessful()) {
-                                        handlePasswordUpdateSuccess(userEmailForSuccessHandler);
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        // Xử lý khi activity được mở lại từ deep link
+        handlePasswordResetLink(intent);
+    }
+
+    private void handlePasswordResetLink(Intent intent) {
+        if (intent != null && intent.getData() != null) {
+            String link = intent.getData().toString();
+
+            // Kiểm tra xem link có phải là link reset password không
+            if (link.contains("mode=resetPassword")) {
+                // Lấy oobCode từ URL
+                String oobCode = extractOobCodeFromUrl(link);
+
+                if (oobCode != null && !tempNewPassword.isEmpty() && tempUserId != null) {
+                    // Xác nhận reset password với oobCode
+                    confirmPasswordReset(oobCode);
+                }
+            }
+        }
+    }
+
+    private String extractOobCodeFromUrl(String url) {
+        try {
+            String[] parts = url.split("oobCode=");
+            if (parts.length > 1) {
+                String code = parts[1].split("&")[0];
+                return code;
+            }
+        } catch (Exception e) {
+            Log.e("ResetPassword", "Error extracting oobCode", e);
+        }
+        return null;
+    }
+
+    private void confirmPasswordReset(String oobCode) {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+
+        // 1. Xác minh oobCode
+        auth.verifyPasswordResetCode(oobCode)
+                .addOnCompleteListener(verifyTask -> {
+                    if (verifyTask.isSuccessful()) {
+                        // 2. Xác nhận reset mật khẩu
+                        auth.confirmPasswordReset(oobCode, tempNewPassword)
+                                .addOnCompleteListener(resetTask -> {
+                                    if (resetTask.isSuccessful()) {
+                                        // 3. Cập nhật mật khẩu trong database
+                                        updateDatabasePassword(tempUserId, tempNewPassword);
                                     } else {
                                         Toast.makeText(ForgotPasswordActivity.this,
-                                                "Database password updated but failed to update Firebase Auth: " + loginTask.getException().getMessage(),
+                                                "Failed to reset password: " + resetTask.getException().getMessage(),
                                                 Toast.LENGTH_SHORT).show();
-                                        goToLoginScreen();
                                     }
                                 });
                     } else {
                         Toast.makeText(ForgotPasswordActivity.this,
-                                "Database password updated but failed to update Firebase Auth: " + resetTask.getException().getMessage(),
+                                "Invalid reset code: " + verifyTask.getException().getMessage(),
                                 Toast.LENGTH_SHORT).show();
-                        goToLoginScreen();
                     }
                 });
     }
+
+    private void updateDatabasePassword(String userId, String newPassword) {
+        databaseReference.child("users").child(userId).child("password")
+                .setValue(newPassword)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(ForgotPasswordActivity.this,
+                                "Password updated successfully!",
+                                Toast.LENGTH_SHORT).show();
+                        // Reset các biến tạm
+                        tempNewPassword = "";
+                        tempUserId = "";
+
+                        // Chuyển đến màn hình login
+                        startActivity(new Intent(ForgotPasswordActivity.this, LoginActivity.class));
+                        finish();
+                    } else {
+                        Toast.makeText(ForgotPasswordActivity.this,
+                                "Database update failed: " + task.getException().getMessage(),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+//    private void updateFirebaseAuthPassword(String email, String newPassword, String userEmailForSuccessHandler) {
+//        FirebaseAuth auth = FirebaseAuth.getInstance();
+//
+//        // Gửi yêu cầu reset mật khẩu qua email (bắt buộc để Firebase Auth cho phép thay đổi mật khẩu)
+//        auth.sendPasswordResetEmail(email)
+//                .addOnCompleteListener(resetTask -> {
+//                    if (resetTask.isSuccessful()) {
+//                        // Sau khi gửi email reset thành công, đăng nhập bằng mật khẩu cũ (nếu có)
+//                        // Lưu ý: Đoạn này giả định người dùng đã click vào link reset trong email
+//                        // Trong thực tế cần có flow phức tạp hơn
+//
+//                        // Đăng nhập bằng email và mật khẩu mới để cập nhật Firebase Auth
+//                        auth.signInWithEmailAndPassword(email, newPassword)
+//                                .addOnCompleteListener(loginTask -> {
+//                                    if (loginTask.isSuccessful()) {
+//                                        handlePasswordUpdateSuccess(userEmailForSuccessHandler);
+//                                    } else {
+//                                        Toast.makeText(ForgotPasswordActivity.this,
+//                                                "Database password updated but failed to update Firebase Auth: " + loginTask.getException().getMessage(),
+//                                                Toast.LENGTH_SHORT).show();
+//                                        goToLoginScreen();
+//                                    }
+//                                });
+//                    } else {
+//                        Toast.makeText(ForgotPasswordActivity.this,
+//                                "Database password updated but failed to update Firebase Auth: " + resetTask.getException().getMessage(),
+//                                Toast.LENGTH_SHORT).show();
+//                        goToLoginScreen();
+//                    }
+//                });
+//    }
 
     private void handlePasswordUpdateSuccess(String userEmail) {
         if (userEmail != null && !userEmail.isEmpty()) {
