@@ -21,6 +21,7 @@ import com.luuhavyy.collabapp.data.model.Product;
 import com.luuhavyy.collabapp.data.model.ReviewWithUser;
 import com.luuhavyy.collabapp.ui.adapters.ProductAdapter;
 import com.luuhavyy.collabapp.ui.adapters.ReviewAdapter;
+import com.luuhavyy.collabapp.ui.fragments.AddToCartDialogFragment;
 import com.luuhavyy.collabapp.ui.viewmodels.ProductViewModel;
 import com.luuhavyy.collabapp.utils.AuthUtil;
 import com.luuhavyy.collabapp.utils.ImageUtil;
@@ -118,7 +119,10 @@ public class ProductDetailActivity extends AppCompatActivity {
         recyclerRelated.setAdapter(relatedAdapter);
 
         // create adapter
-        relatedAdapter = new ProductAdapter(this, new ArrayList<>());
+        relatedAdapter = new ProductAdapter(this, new ArrayList<>(), productId -> {
+            AddToCartDialogFragment dialog = AddToCartDialogFragment.newInstance(productId);
+            dialog.show(getSupportFragmentManager(), "AddToCartDialog");
+        });
 
         // set adapter to RecyclerView
         recyclerRelated.setAdapter(relatedAdapter);
@@ -138,7 +142,8 @@ public class ProductDetailActivity extends AppCompatActivity {
             Toast.makeText(this, "Mua ngay sản phẩm!", Toast.LENGTH_SHORT).show();
         });
         btnAddToCart.setOnClickListener(v -> {
-            Toast.makeText(this, "Đã thêm vào giỏ hàng!", Toast.LENGTH_SHORT).show();
+            AddToCartDialogFragment dialog = AddToCartDialogFragment.newInstance(productId);
+            dialog.show(getSupportFragmentManager(), "AddToCartDialog");
         });
     }
 
