@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.luuhavyy.collabapp.R;
 import com.luuhavyy.collabapp.ui.adapters.ProductAdapter;
-import com.luuhavyy.collabapp.ui.fragments.AddToCartDialogFragment;
+import com.luuhavyy.collabapp.ui.dialogs.AddToCartDialogFragment;
 import com.luuhavyy.collabapp.ui.viewmodels.ProductViewModel;
 import com.luuhavyy.collabapp.utils.LoadingHandlerUtil;
 

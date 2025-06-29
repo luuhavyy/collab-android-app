@@ -21,7 +21,7 @@ import com.luuhavyy.collabapp.data.model.Product;
 import com.luuhavyy.collabapp.data.model.ReviewWithUser;
 import com.luuhavyy.collabapp.ui.adapters.ProductAdapter;
 import com.luuhavyy.collabapp.ui.adapters.ReviewAdapter;
-import com.luuhavyy.collabapp.ui.fragments.AddToCartDialogFragment;
+import com.luuhavyy.collabapp.ui.dialogs.AddToCartDialogFragment;
 import com.luuhavyy.collabapp.ui.viewmodels.ProductViewModel;
 import com.luuhavyy.collabapp.utils.AuthUtil;
 import com.luuhavyy.collabapp.utils.ImageUtil;

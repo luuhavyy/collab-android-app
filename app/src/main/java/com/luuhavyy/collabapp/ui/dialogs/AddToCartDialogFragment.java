@@ -1,4 +1,4 @@
-package com.luuhavyy.collabapp.ui.fragments;
+package com.luuhavyy.collabapp.ui.dialogs;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

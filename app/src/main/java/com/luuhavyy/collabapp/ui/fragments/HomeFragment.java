@@ -25,6 +25,7 @@ import com.luuhavyy.collabapp.ui.activities.CartActivity;
 import com.luuhavyy.collabapp.ui.activities.SearchActivity;
 import com.luuhavyy.collabapp.ui.adapters.BannerAdapter;
 import com.luuhavyy.collabapp.ui.adapters.ProductAdapter;
+import com.luuhavyy.collabapp.ui.dialogs.AddToCartDialogFragment;
 import com.luuhavyy.collabapp.ui.dialogs.DialogFilterAndSorting;
 import com.luuhavyy.collabapp.ui.viewmodels.ProductViewModel;
 import com.luuhavyy.collabapp.utils.AuthUtil;
