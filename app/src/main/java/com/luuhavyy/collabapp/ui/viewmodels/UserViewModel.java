@@ -86,7 +86,7 @@ public class UserViewModel extends ViewModel {
                 for (DataSnapshot child : snapshot.getChildren()) {
                     User user = child.getValue(User.class);
                     foundUser = user;
-                    break; // lấy user đầu tiên
+                    break; // Get first user
                 }
                 userLiveData.setValue(foundUser);
                 if (callback != null) callback.onComplete();
