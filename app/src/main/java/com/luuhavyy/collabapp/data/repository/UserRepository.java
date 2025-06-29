@@ -38,6 +38,12 @@ public class UserRepository {
         void onError(String error);
     }
 
+    public void loadUserByAuthId(String authId, ValueEventListener listener) {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users");
+        ref.orderByChild("authid").equalTo(authId)
+                .addListenerForSingleValueEvent(listener);
+    }
+
     public void getUserById(String userId, UserCallback callback) {
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
