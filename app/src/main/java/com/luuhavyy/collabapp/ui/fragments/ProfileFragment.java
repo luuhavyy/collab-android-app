@@ -41,6 +41,7 @@ import com.luuhavyy.collabapp.utils.ImageUtil;
 import com.luuhavyy.collabapp.utils.LoadingHandlerUtil;
 
 import java.io.File;
+
 import com.luuhavyy.collabapp.data.model.User;
 
 public class ProfileFragment extends Fragment {
@@ -77,11 +78,15 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        userId = AuthUtil.getCurrentUser().getUid();
-
+        String authId = AuthUtil.getCurrentUser().getUid();
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+
         LoadingHandlerUtil.executeOnceWithLoading(requireContext(), onLoaded -> {
-            userViewModel.listenToUserRealtime(userId, onLoaded);  // start listening for changes
+            userViewModel.loadUser(authId, () -> {
+                User user = userViewModel.getUserLiveData().getValue();
+                if (user != null) userId = user.getUserid();
+                onLoaded.onComplete();
+            });
         });
 
         userViewModel.getUserLiveData().observe(getViewLifecycleOwner(), user -> {

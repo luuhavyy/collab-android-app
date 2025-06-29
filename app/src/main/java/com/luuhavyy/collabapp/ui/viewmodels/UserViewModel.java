@@ -78,19 +78,23 @@ public class UserViewModel extends ViewModel {
         }
     }
 
-    public void loadUser(String authId) {
+    public void loadUser(String authId, LoadingHandlerUtil.TaskCallback callback) {
         userRepository.loadUserByAuthId(authId, new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                User foundUser = null;
                 for (DataSnapshot child : snapshot.getChildren()) {
                     User user = child.getValue(User.class);
-                    userLiveData.setValue(user);
-                    break; // chỉ lấy user đầu tiên
+                    foundUser = user;
+                    break; // lấy user đầu tiên
                 }
+                userLiveData.setValue(foundUser);
+                if (callback != null) callback.onComplete();
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                // Xử lý lỗi nếu cần
+                userLiveData.setValue(null);
+                if (callback != null) callback.onComplete();
             }
         });
     }
