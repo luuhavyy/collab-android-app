@@ -220,7 +220,6 @@ public class ProfileFragment extends Fragment {
             public void onConfirmChange(Runnable onSuccess, Runnable onError) {
                 if (imageUri != null) {
                     userViewModel.updateProfilePicture(requireContext(), imageUri, userId, onSuccess, onError);
-                    Toast.makeText(requireContext(), "Profile picture changed", Toast.LENGTH_SHORT).show();
                 } else {
                     onError.run();
                 }
