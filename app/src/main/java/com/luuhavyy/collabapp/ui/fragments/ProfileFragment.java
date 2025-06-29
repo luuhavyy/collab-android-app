@@ -25,6 +25,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.imageview.ShapeableImageView;
@@ -136,12 +137,22 @@ public class ProfileFragment extends Fragment {
     }
 
     private void handleMenuClick(int index) {
-        if (index == 0) {
-            startActivity(new Intent(getActivity(), EditInformationActivity.class));
-        } else if (index == 3) { // Index của Policy
-            startActivity(new Intent(getActivity(), PolicyActivity.class));
+        switch (index) {
+            case 0:
+                startActivity(new Intent(getActivity(), EditInformationActivity.class));
+                break;
+            case 1:
+                Navigation.findNavController(requireView()).navigate(R.id.nav_noti);
+                break;
+            case 2:
+                Navigation.findNavController(requireView()).navigate(R.id.nav_order);
+                break;
+            case 3:
+                startActivity(new Intent(getActivity(), PolicyActivity.class));
+                break;
+            default:
+                break;
         }
-        // Add more item here
     }
 
     private void setupAvatarButton(View view) {
