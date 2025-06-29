@@ -46,6 +46,7 @@
         <activity android:name=".ui.activities.OrderDetailActivity" />
         <activity android:name=".ui.activities.ReviewProductActivity"/>
         <activity android:name=".ui.activities.PolicyActivity"/>
+        <activity android:name=".ui.activities.PromotionActivity" />
 
 
         <!-- Meta-data -->

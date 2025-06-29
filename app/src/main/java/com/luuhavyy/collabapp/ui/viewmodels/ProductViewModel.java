@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.luuhavyy.collabapp.data.model.Product;
 import com.luuhavyy.collabapp.data.model.ProductFilterSort;
@@ -192,22 +194,20 @@ public class ProductViewModel extends ViewModel {
     }
 
     public void searchProductByName(String keyword, LoadingHandlerUtil.TaskCallback callback) {
-        if (productListener != null) {
-            callback.onComplete();
-            return;
-        }
-
-        repository.searchProductByName(keyword, new ValueEventListener() {
+        DatabaseReference productsRef = FirebaseDatabase.getInstance().getReference("products");
+        productsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 List<Product> result = new ArrayList<>();
                 for (DataSnapshot child : snapshot.getChildren()) {
                     Product product = child.getValue(Product.class);
-                    if (product != null && product.getName().toLowerCase().contains(keyword.toLowerCase())) {
+                    // Ignore case & contains
+                    if (product != null && product.getName() != null
+                            && product.getName().toLowerCase().contains(keyword.toLowerCase())) {
                         result.add(product);
                     }
                 }
-                productsLiveData.setValue(result);
+                productsLiveData.setValue(result); // Hoặc callback trả kết quả
                 callback.onComplete();
             }
 

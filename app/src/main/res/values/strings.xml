@@ -207,4 +207,7 @@
     <string name="buy_now">Buy Now</string>
     <string name="relevant_product">Relevant Product</string>
     <string name="review">Review</string>
+    <string name="save_promotion">Save Promotion</string>
+    <string name="use_promotion">Use Promotion</string>
+    <string name="promotion_description">Promotion Description</string>
 </resources>
