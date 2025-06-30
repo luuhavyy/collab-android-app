@@ -82,7 +82,7 @@ public class UserViewModel extends ViewModel {
         userRepository.loadUserByAuthId(authId, new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                User user = snapshot.getValue(User.class);  // <-- Chỉ cần getValue trực tiếp
+                User user = snapshot.getValue(User.class);
                 userLiveData.setValue(user);
                 if (callback != null) callback.onComplete();
             }
