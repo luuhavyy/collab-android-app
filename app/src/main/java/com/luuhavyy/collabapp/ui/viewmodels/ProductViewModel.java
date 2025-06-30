@@ -20,6 +20,9 @@ import com.luuhavyy.collabapp.data.repository.ReviewRepository;
 import com.luuhavyy.collabapp.data.repository.UserRepository;
 import com.luuhavyy.collabapp.utils.LoadingHandlerUtil;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -40,14 +43,20 @@ public class ProductViewModel extends ViewModel {
     private final MutableLiveData<Product> productLiveData = new MutableLiveData<>();
     private final MutableLiveData<List<Review>> reviewListLiveData = new MutableLiveData<>();
     private final ReviewRepository reviewRepository = new ReviewRepository();
+
     public LiveData<Product> getProductLiveData() {
         return productLiveData;
     }
+
     public LiveData<List<Review>> getReviewListLiveData() {
         return reviewListLiveData;
     }
+
     private final MutableLiveData<List<ReviewWithUser>> reviewWithUserLiveData = new MutableLiveData<>();
-    public LiveData<List<ReviewWithUser>> getReviewWithUserLiveData() { return reviewWithUserLiveData; }
+
+    public LiveData<List<ReviewWithUser>> getReviewWithUserLiveData() {
+        return reviewWithUserLiveData;
+    }
 
 
     public void fetchReviewsWithUser(String productId) {
@@ -83,6 +92,7 @@ public class ProductViewModel extends ViewModel {
                                 reviewWithUserLiveData.postValue(reviewWithUserList);
                             }
                         }
+
                         @Override
                         public void onError(String error) {
                             // Lấy user lỗi, vẫn tăng count
@@ -226,6 +236,7 @@ public class ProductViewModel extends ViewModel {
                 productLiveData.setValue(product);
                 callback.onComplete();
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 productLiveData.setValue(null);
@@ -240,11 +251,116 @@ public class ProductViewModel extends ViewModel {
             public void onReviewsLoaded(List<Review> reviews) {
                 reviewListLiveData.postValue(reviews);
             }
+
             @Override
             public void onError(String error) {
                 // Có thể log lỗi hoặc show Toast
             }
         });
+    }
+
+    public void addToCartByAuthId(String authId, String productId, float price, int quantity, Runnable onSuccess, Runnable onError) {
+        userRepository.loadUserIdByAuthId(authId, userId -> {
+            if (userId != null) {
+                addToCart(userId, productId, price, quantity, onSuccess, onError);
+            } else {
+                if (onError != null) onError.run();
+            }
+        });
+    }
+
+    public void addToCart(String userId, String productId, float price, int quantity, Runnable onSuccess, Runnable onError) {
+        DatabaseReference cartRef = FirebaseDatabase.getInstance().getReference("cart");
+        // 1. Tìm cart của user
+        cartRef.orderByChild("userid").equalTo(userId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        DatabaseReference userCartRef;
+                        String cartId;
+
+                        // Lấy 3 số cuối hoặc toàn bộ nếu userId < 3
+                        String cartSuffix = userId.length() > 3
+                                ? userId.substring(userId.length() - 3)
+                                : userId;
+                        cartId = "cart" + cartSuffix;
+
+                        String now = OffsetDateTime.now(ZoneOffset.ofHours(7))
+                                .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+
+                        if (snapshot.exists()) {
+                            // User đã có cart, lấy cartId đầu tiên
+                            DataSnapshot cartSnap = null;
+                            for (DataSnapshot child : snapshot.getChildren()) {
+                                cartSnap = child;
+                                break;
+                            }
+                            cartId = cartSnap.getKey();
+                            userCartRef = cartRef.child(cartId);
+                        } else {
+                            // Chưa có cart, tạo mới
+                            userCartRef = cartRef.child(cartId);
+                            Map<String, Object> cart = new HashMap<>();
+                            cart.put("cartid", cartId);
+                            cart.put("userid", userId);
+                            cart.put("createdat", now);
+                            cart.put("promotionid", "");
+                            cart.put("totalamount", 0);
+                            cart.put("updatedat", now);
+                            userCartRef.setValue(cart);
+                        }
+
+                        // 2. Thêm hoặc cập nhật sản phẩm trong giỏ
+                        DatabaseReference productsRef = userCartRef.child("products");
+                        productsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot allProdSnap) {
+                                boolean existed = false;
+                                String existedKey = null;
+
+                                // 1. Kiểm tra sản phẩm đã có chưa
+                                for (DataSnapshot prodChild : allProdSnap.getChildren()) {
+                                    String pid = prodChild.child("productid").getValue(String.class);
+                                    if (pid != null && pid.equals(productId)) {
+                                        existed = true;
+                                        existedKey = prodChild.getKey();
+                                        Integer oldQuantity = prodChild.child("quantity").getValue(Integer.class);
+                                        int newQuantity = (oldQuantity != null ? oldQuantity : 0) + quantity;
+                                        prodChild.getRef().child("quantity").setValue(newQuantity);
+                                        break;
+                                    }
+                                }
+
+                                // 2. Nếu chưa tồn tại, thêm mới với key là số tiếp theo
+                                if (!existed) {
+                                    // Lấy số lượng hiện tại để làm key mới
+                                    long count = allProdSnap.getChildrenCount();
+                                    String prodKey = String.valueOf(count); // key = tổng số sản phẩm hiện có (0-based, tức là thêm mới sẽ là next số)
+                                    Map<String, Object> prod = new HashMap<>();
+                                    prod.put("productid", productId);
+                                    prod.put("price", price);
+                                    prod.put("quantity", quantity);
+                                    prod.put("selected", false);
+                                    productsRef.child(prodKey).setValue(prod);
+                                }
+
+                                // Cập nhật updatedat
+                                userCartRef.child("updatedat").setValue(now);
+                                onSuccess.run();
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                onError.run();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        onError.run();
+                    }
+                });
     }
 
     @Override

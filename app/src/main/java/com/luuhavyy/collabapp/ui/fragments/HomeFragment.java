@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,6 +22,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.luuhavyy.collabapp.R;
 import com.luuhavyy.collabapp.data.model.Banner;
+import com.luuhavyy.collabapp.data.model.ProductFilterSort;
 import com.luuhavyy.collabapp.ui.activities.CartActivity;
 import com.luuhavyy.collabapp.ui.activities.SearchActivity;
 import com.luuhavyy.collabapp.ui.adapters.BannerAdapter;
@@ -78,6 +80,36 @@ public class HomeFragment extends Fragment {
             } else {
                 Toast.makeText(requireContext(), "Error loading products", Toast.LENGTH_SHORT).show();
             }
+        });
+
+        LinearLayout btnSunglasses = view.findViewById(R.id.btn_sunglasses);
+        LinearLayout btnFrames= view.findViewById(R.id.btn_frames);
+
+
+        btnSunglasses.setOnClickListener(v -> {
+            ProductFilterSort filter = new ProductFilterSort(
+                    0,              // minPrice
+                    Float.MAX_VALUE,// maxPrice
+                    false,          // frameGlasses
+                    true,           // sunglasses
+                    null            // sortBy
+            );
+            LoadingHandlerUtil.executeOnceWithLoading(requireContext(), onLoaded -> {
+                productViewModel.fetchProductsWithFilter(filter, onLoaded);
+            });
+        });
+
+        btnFrames.setOnClickListener(v -> {
+            ProductFilterSort filter = new ProductFilterSort(
+                    0,
+                    Float.MAX_VALUE,
+                    true,           // frameGlasses
+                    false,          // sunglasses
+                    null
+            );
+            LoadingHandlerUtil.executeOnceWithLoading(requireContext(), onLoaded -> {
+                productViewModel.fetchProductsWithFilter(filter, onLoaded);
+            });
         });
 
         // Setup toolbar menu (cart icon)

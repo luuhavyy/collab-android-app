@@ -15,13 +15,16 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.luuhavyy.collabapp.R;
 import com.luuhavyy.collabapp.ui.viewmodels.ProductViewModel;
+import com.luuhavyy.collabapp.ui.viewmodels.UserViewModel;
 
 public class AddToCartDialogFragment extends DialogFragment {
     private int quantity = 1;
     private float price = 0;
     private ProductViewModel productViewModel;
+    private UserViewModel userViewModel = new UserViewModel();
 
     public static AddToCartDialogFragment newInstance(String productId) {
         AddToCartDialogFragment fragment = new AddToCartDialogFragment();
@@ -76,8 +79,21 @@ public class AddToCartDialogFragment extends DialogFragment {
         btnClose.setOnClickListener(v -> dismiss());
 
         btnAddToCart.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Added " + quantity + " to cart!", Toast.LENGTH_SHORT).show();
-            dismiss();
+            String authId = FirebaseAuth.getInstance().getUid();
+            if (authId == null) {
+                Toast.makeText(getContext(), "Please login to use cart!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            productViewModel.addToCartByAuthId(authId, productId, price, quantity,
+                    () -> {
+                        // Push activity "Added to Cart" sau khi add cart thành công
+                        userViewModel.logUserActivityByAuthId(authId, "Added to Cart", productId);
+
+                        Toast.makeText(getContext(), "Added " + quantity + " to cart!", Toast.LENGTH_SHORT).show();
+                        dismiss();
+                    },
+                    () -> Toast.makeText(getContext(), "Failed to add to cart!", Toast.LENGTH_SHORT).show()
+            );
         });
 
         return view;
