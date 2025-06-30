@@ -94,6 +94,18 @@ public class UserViewModel extends ViewModel {
         });
     }
 
+    public void logUserActivityByAuthId(String authId, String action, String targetId) {
+        userRepository.loadUserIdByAuthId(authId, userId -> {
+            if (userId != null) {
+                logUserActivity(userId, action, targetId);
+            }
+        });
+    }
+
+    public void logUserActivity(String userId, String action, String targetId) {
+        userRepository.logUserActivity(userId, action, targetId);
+    }
+
     @Override
     protected void onCleared() {
         super.onCleared();

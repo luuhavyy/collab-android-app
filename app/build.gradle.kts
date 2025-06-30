@@ -70,6 +70,9 @@ dependencies {
     // --- Lottie Animation ---
     implementation(libs.android.lottie)
 
+    //noinspection UseTomlInstead
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
     // --- Testing ---
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
