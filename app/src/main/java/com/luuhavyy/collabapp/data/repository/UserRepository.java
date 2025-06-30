@@ -11,6 +11,9 @@ import com.luuhavyy.collabapp.data.model.User;
 import com.luuhavyy.collabapp.data.remote.UserRemoteDataSource;
 
 import java.io.IOException;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -119,35 +122,50 @@ public class UserRepository {
         userActivityRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                long count = snapshot.getChildrenCount();
-                String activityId = String.valueOf(count);
-
-                // Đếm số "View Product"
+                // Tìm max id hiện tại
+                long maxId = -1;
                 int viewProductCount = 0;
                 for (DataSnapshot child : snapshot.getChildren()) {
+                    // Kiểm tra key là số
+                    try {
+                        long id = Long.parseLong(child.getKey());
+                        if (id > maxId) maxId = id;
+                    } catch (Exception ignored) {
+                    }
+                    // Đếm số lần "View Product"
                     Object actionVal = child.child("action").getValue();
                     if (actionVal != null && actionVal.toString().equals("View Product")) {
                         viewProductCount++;
                     }
                 }
+                // id mới là maxId + 1
+                String activityId = String.valueOf(maxId + 1);
 
-                // Ghi activity mới
+                String now = OffsetDateTime.now(ZoneOffset.ofHours(7))
+                        .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+
+                // Tạo activity object
                 Map<String, Object> activity = new HashMap<>();
-                activity.put("activityid", activityId);
+                activity.put("activityid", "act" + activityId);
                 activity.put("action", action);
                 activity.put("targetid", targetId);
-                activity.put("timestamp", System.currentTimeMillis());
+                activity.put("timestamp", now);
 
+                // Thêm activity mới vào node với id mới
                 userActivityRef.child(activityId).setValue(activity);
 
                 // Nếu số "View Product" >= 4 và lần này tiếp tục là "View Product" (tổng đủ 5)
                 if (action.equals("View Product") && (viewProductCount + 1) >= 5) {
                     callWebhook(userId); // Call webhook n8n
                 }
+                if (action.equals("Added to Cart")) {
+                    callWebhook(userId);
+                }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                // Handle error
             }
         });
     }
