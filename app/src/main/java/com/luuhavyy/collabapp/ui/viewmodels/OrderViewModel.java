@@ -29,23 +29,17 @@ public class OrderViewModel extends ViewModel {
     public void fetchOrdersByStatusForCurrentUser(String status) {
         String authId = FirebaseAuth.getInstance().getUid();
         if (authId == null) {
-            ordersLiveData.postValue(new ArrayList<>()); // Không login, trả về rỗng
+            ordersLiveData.postValue(new ArrayList<>());
             return;
         }
 
         userRepository.loadUserByAuthId(authId, new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                String userId = null;
-                for (DataSnapshot child : snapshot.getChildren()) {
-                    User user = child.getValue(User.class);
-                    if (user != null && user.getUserid() != null) {
-                        userId = user.getUserid();
-                        break;
-                    }
-                }
+                User user = snapshot.getValue(User.class);
+                String userId = (user != null) ? user.getUserid() : null;
+
                 if (userId != null) {
-                    // 2. Lấy orders theo userId và status
                     orderRepository.getOrdersByStatusAndUser(status, userId, new OrderRepository.OrdersCallback() {
                         @Override
                         public void onOrdersLoaded(List<Order> orders) {
@@ -57,7 +51,6 @@ public class OrderViewModel extends ViewModel {
                         }
                     });
                 } else {
-                    // Không tìm thấy user
                     ordersLiveData.postValue(new ArrayList<>());
                 }
             }

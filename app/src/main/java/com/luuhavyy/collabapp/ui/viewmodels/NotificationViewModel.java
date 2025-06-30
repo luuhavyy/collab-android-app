@@ -32,14 +32,8 @@ public class NotificationViewModel extends ViewModel {
         userRepo.loadUserByAuthId(authId, new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                String userId = null;
-                for (DataSnapshot child : snapshot.getChildren()) {
-                    User user = child.getValue(User.class);
-                    if (user != null && user.getUserid() != null) {
-                        userId = user.getUserid();
-                        break;
-                    }
-                }
+                User user = snapshot.getValue(User.class);
+                String userId = user != null ? user.getUserid() : null;
                 if (userId != null) {
                     listenNotificationsByAuthId(userId);
                 } else {

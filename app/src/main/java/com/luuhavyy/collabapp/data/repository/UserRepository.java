@@ -35,13 +35,30 @@ public class UserRepository {
 
     public interface UserCallback {
         void onUserLoaded(User user);
+
         void onError(String error);
     }
 
     public void loadUserByAuthId(String authId, ValueEventListener listener) {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users");
-        ref.orderByChild("authid").equalTo(authId)
-                .addListenerForSingleValueEvent(listener);
+        DatabaseReference mappingRef = FirebaseDatabase.getInstance()
+                .getReference("firebaseUidToUserId").child(authId);
+        mappingRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String userId = snapshot.getValue(String.class);
+                if (userId == null) {
+                    listener.onCancelled(DatabaseError.fromException(new Exception("No userId found for this authId")));
+                    return;
+                }
+                DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
+                userRef.addListenerForSingleValueEvent(listener);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                listener.onCancelled(error);
+            }
+        });
     }
 
     public void getUserById(String userId, UserCallback callback) {
@@ -52,6 +69,7 @@ public class UserRepository {
                 User user = snapshot.getValue(User.class);
                 callback.onUserLoaded(user);
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 callback.onError(error.getMessage());
