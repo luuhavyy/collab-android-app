@@ -145,7 +145,8 @@ public class ProductDetailActivity extends AppCompatActivity {
         });
 
         btnBuyNow.setOnClickListener(v -> {
-            Toast.makeText(this, "Mua ngay sản phẩm!", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, CheckoutActivity.class);
+            startActivity(intent);
         });
         btnAddToCart.setOnClickListener(v -> {
             AddToCartDialogFragment dialog = AddToCartDialogFragment.newInstance(productId);

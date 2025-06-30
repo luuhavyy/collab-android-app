@@ -148,20 +148,26 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- Nút -->
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_more_products"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Check out more Products" />
+                android:background="@drawable/bg_button_rounded"
+                android:backgroundTint="@color/deep_green"
+                android:text="@string/check_out_more_products"
+                android:textColor="@color/white"
+                android:layout_marginBottom="20dp"
+                app:backgroundTint="@null" />
 
-            <Button
+            <!-- Save Promotion button -->
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_back_home"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Back to Homepage" />
+                android:background="@drawable/bg_button_outline"
+                android:text="@string/back_to_homepage"
+                android:textColor="@color/deep_green"
+                app:backgroundTint="@null" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

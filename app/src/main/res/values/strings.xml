@@ -211,4 +211,6 @@
     <string name="use_promotion">Use Promotion</string>
     <string name="promotion_description">Promotion Description</string>
     <string name="quantity">Quantity</string>
+    <string name="back_to_homepage">Back to Homepage</string>
+    <string name="check_out_more_products">Check out more Products</string>
 </resources>
