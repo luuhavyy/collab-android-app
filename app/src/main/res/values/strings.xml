@@ -210,4 +210,5 @@
     <string name="save_promotion">Save Promotion</string>
     <string name="use_promotion">Use Promotion</string>
     <string name="promotion_description">Promotion Description</string>
+    <string name="quantity">Quantity</string>
 </resources>

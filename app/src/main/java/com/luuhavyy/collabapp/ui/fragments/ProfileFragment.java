@@ -25,6 +25,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.imageview.ShapeableImageView;
@@ -41,7 +42,6 @@ import com.luuhavyy.collabapp.utils.ImageUtil;
 import com.luuhavyy.collabapp.utils.LoadingHandlerUtil;
 
 import java.io.File;
-import com.luuhavyy.collabapp.data.model.User;
 
 public class ProfileFragment extends Fragment {
     private UserViewModel userViewModel;
@@ -77,11 +77,15 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        userId = AuthUtil.getCurrentUser().getUid();
-
+        String authId = AuthUtil.getCurrentUser().getUid();
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+
         LoadingHandlerUtil.executeOnceWithLoading(requireContext(), onLoaded -> {
-            userViewModel.listenToUserRealtime(userId, onLoaded);  // start listening for changes
+            userViewModel.loadUser(authId, () -> {
+                User user = userViewModel.getUserLiveData().getValue();
+                if (user != null) userId = user.getUserid();
+                onLoaded.onComplete();
+            });
         });
 
         userViewModel.getUserLiveData().observe(getViewLifecycleOwner(), user -> {
@@ -133,12 +137,22 @@ public class ProfileFragment extends Fragment {
     }
 
     private void handleMenuClick(int index) {
-        if (index == 0) {
-            startActivity(new Intent(getActivity(), EditInformationActivity.class));
-        } else if (index == 3) { // Index của Policy
-            startActivity(new Intent(getActivity(), PolicyActivity.class));
+        switch (index) {
+            case 0:
+                startActivity(new Intent(getActivity(), EditInformationActivity.class));
+                break;
+            case 1:
+                Navigation.findNavController(requireView()).navigate(R.id.nav_noti);
+                break;
+            case 2:
+                Navigation.findNavController(requireView()).navigate(R.id.nav_order);
+                break;
+            case 3:
+                startActivity(new Intent(getActivity(), PolicyActivity.class));
+                break;
+            default:
+                break;
         }
-        // Add more item here
     }
 
     private void setupAvatarButton(View view) {
@@ -217,7 +231,6 @@ public class ProfileFragment extends Fragment {
             public void onConfirmChange(Runnable onSuccess, Runnable onError) {
                 if (imageUri != null) {
                     userViewModel.updateProfilePicture(requireContext(), imageUri, userId, onSuccess, onError);
-                    Toast.makeText(requireContext(), "Profile picture changed", Toast.LENGTH_SHORT).show();
                 } else {
                     onError.run();
                 }

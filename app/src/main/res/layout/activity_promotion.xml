@@ -168,9 +168,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_button_outline"
-            android:backgroundTint="@color/deep_green"
             android:text="@string/save_promotion"
-            android:textColor="@color/white"
+            android:textColor="@color/deep_green"
             app:backgroundTint="@null" />
     </LinearLayout>
 </ScrollView>

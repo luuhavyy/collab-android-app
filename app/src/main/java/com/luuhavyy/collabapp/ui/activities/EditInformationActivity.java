@@ -33,8 +33,22 @@ public class EditInformationActivity extends AppCompatActivity {
         setupToolbar();
         initViews();
 
-        userId = AuthUtil.getCurrentUser().getUid();
-        loadUserData();
+        String authId = AuthUtil.getCurrentUser().getUid();
+
+        LoadingHandlerUtil.executeOnceWithLoading(this, onLoaded -> {
+            userViewModel.loadUser(authId, () -> {
+                User user = userViewModel.getUserLiveData().getValue();
+                if (user != null) {
+                    userId = user.getUserid();
+                    currentUser = user;
+                    runOnUiThread(() -> populateUserToForm(currentUser));
+                } else {
+                    Toast.makeText(this, "User not found", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+                onLoaded.onComplete();
+            });
+        });
 
         btnSave.setOnClickListener(v -> {
             if (currentUser == null) return;
@@ -54,6 +68,7 @@ public class EditInformationActivity extends AppCompatActivity {
             );
         });
     }
+
 
     private void setupToolbar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -77,17 +92,6 @@ public class EditInformationActivity extends AppCompatActivity {
                 android.R.layout.simple_spinner_item, genderOptions);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerGender.setAdapter(adapter);
-    }
-
-    private void loadUserData() {
-        LoadingHandlerUtil.executeOnceWithLoading(this, callback -> {
-            userViewModel.listenToUserRealtime(userId, () -> {
-                currentUser = userViewModel.getUserLiveData().getValue();
-                if (currentUser != null) populateUserToForm(currentUser);
-                else Toast.makeText(this, "User not found", Toast.LENGTH_SHORT).show();
-                callback.onComplete();
-            });
-        });
     }
 
     private void populateUserToForm(User user) {

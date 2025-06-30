@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.luuhavyy.collabapp.R;
 import com.luuhavyy.collabapp.ui.adapters.ProductAdapter;
+import com.luuhavyy.collabapp.ui.dialogs.AddToCartDialogFragment;
 import com.luuhavyy.collabapp.ui.viewmodels.ProductViewModel;
 import com.luuhavyy.collabapp.utils.LoadingHandlerUtil;
 
@@ -48,7 +49,10 @@ public class SearchActivity extends AppCompatActivity {
         layoutNoProduct = findViewById(R.id.layout_no_product);
 
         productViewModel = new ViewModelProvider(this).get(ProductViewModel.class);
-        productAdapter = new ProductAdapter(SearchActivity.this, new ArrayList<>());
+        productAdapter = new ProductAdapter(this, new ArrayList<>(), productId -> {
+            AddToCartDialogFragment dialog = AddToCartDialogFragment.newInstance(productId);
+            dialog.show(getSupportFragmentManager(), "AddToCartDialog");
+        });
         recyclerProducts.setLayoutManager(new GridLayoutManager(this, 2));
         recyclerProducts.setAdapter(productAdapter);
 

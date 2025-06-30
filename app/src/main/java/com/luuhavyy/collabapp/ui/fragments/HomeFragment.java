@@ -25,6 +25,7 @@ import com.luuhavyy.collabapp.ui.activities.CartActivity;
 import com.luuhavyy.collabapp.ui.activities.SearchActivity;
 import com.luuhavyy.collabapp.ui.adapters.BannerAdapter;
 import com.luuhavyy.collabapp.ui.adapters.ProductAdapter;
+import com.luuhavyy.collabapp.ui.dialogs.AddToCartDialogFragment;
 import com.luuhavyy.collabapp.ui.dialogs.DialogFilterAndSorting;
 import com.luuhavyy.collabapp.ui.viewmodels.ProductViewModel;
 import com.luuhavyy.collabapp.utils.AuthUtil;
@@ -36,6 +37,7 @@ import java.util.List;
 public class HomeFragment extends Fragment {
     private ProductViewModel productViewModel;
     private RecyclerView recyclerView;
+    private ProductAdapter productAdapter;
 
     @Nullable
     @Override
@@ -58,6 +60,12 @@ public class HomeFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recycler_products);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
+        productAdapter = new ProductAdapter(requireContext(), new ArrayList<>(), productId -> {
+            AddToCartDialogFragment dialog = AddToCartDialogFragment.newInstance(productId);
+            dialog.show(getChildFragmentManager(), "AddToCartDialog");
+        });
+        recyclerView.setAdapter(productAdapter);
+
         // Setup ViewModel
         productViewModel = new ViewModelProvider(this).get(ProductViewModel.class);
         LoadingHandlerUtil.executeOnceWithLoading(requireContext(), onLoaded -> {
@@ -66,7 +74,7 @@ public class HomeFragment extends Fragment {
 
         productViewModel.getProductsLiveData().observe(getViewLifecycleOwner(), products -> {
             if (products != null) {
-                recyclerView.setAdapter(new ProductAdapter(this.getContext() ,products));
+                productAdapter.setProducts(products);
             } else {
                 Toast.makeText(requireContext(), "Error loading products", Toast.LENGTH_SHORT).show();
             }

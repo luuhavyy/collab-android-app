@@ -153,12 +153,17 @@ public class ProfilePictureDialogFragment extends DialogFragment {
         View layout = inflater.inflate(R.layout.dialog_profile_picture_confirm_change, root, false);
         ivAvatar = layout.findViewById(R.id.iv_avatar);
         setImageUri(imageUri);
+
         layout.findViewById(R.id.btn_confirm_change).setOnClickListener(v -> {
             if (listener != null) listener.onConfirmChange(() -> {
+                // Success
+                Toast.makeText(getContext(), "Changed profile picture successfully!", Toast.LENGTH_SHORT).show();
                 currentState = State.DEFAULT;
                 render(root);
                 dismiss();
             }, () -> {
+                // Error
+                Toast.makeText(getContext(), "Failed to change profile picture!", Toast.LENGTH_SHORT).show();
             });
         });
         return layout;

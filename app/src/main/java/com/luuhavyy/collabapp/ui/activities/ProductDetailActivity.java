@@ -16,12 +16,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.firebase.auth.FirebaseAuth;
 import com.luuhavyy.collabapp.R;
 import com.luuhavyy.collabapp.data.model.Product;
 import com.luuhavyy.collabapp.data.model.ReviewWithUser;
 import com.luuhavyy.collabapp.ui.adapters.ProductAdapter;
 import com.luuhavyy.collabapp.ui.adapters.ReviewAdapter;
+import com.luuhavyy.collabapp.ui.dialogs.AddToCartDialogFragment;
 import com.luuhavyy.collabapp.ui.viewmodels.ProductViewModel;
+import com.luuhavyy.collabapp.ui.viewmodels.UserViewModel;
 import com.luuhavyy.collabapp.utils.AuthUtil;
 import com.luuhavyy.collabapp.utils.ImageUtil;
 import com.luuhavyy.collabapp.utils.LoadingHandlerUtil;
@@ -35,6 +38,7 @@ public class ProductDetailActivity extends AppCompatActivity {
     private RecyclerView recyclerReviews;
     private Button btnBuyNow, btnAddToCart;
     private ProductViewModel productViewModel;
+    private UserViewModel userViewModel = new UserViewModel();
     private String productId;
     private ReviewAdapter reviewAdapter;
     private ProductAdapter relatedAdapter;
@@ -53,6 +57,9 @@ public class ProductDetailActivity extends AppCompatActivity {
             finish();
             return;
         }
+
+        String authId = FirebaseAuth.getInstance().getUid();
+        userViewModel.logUserActivityByAuthId(authId, "View Product", productId);
 
         // Ánh xạ view
         imgProduct = findViewById(R.id.img_product);
@@ -118,7 +125,10 @@ public class ProductDetailActivity extends AppCompatActivity {
         recyclerRelated.setAdapter(relatedAdapter);
 
         // create adapter
-        relatedAdapter = new ProductAdapter(this, new ArrayList<>());
+        relatedAdapter = new ProductAdapter(this, new ArrayList<>(), productId -> {
+            AddToCartDialogFragment dialog = AddToCartDialogFragment.newInstance(productId);
+            dialog.show(getSupportFragmentManager(), "AddToCartDialog");
+        });
 
         // set adapter to RecyclerView
         recyclerRelated.setAdapter(relatedAdapter);
@@ -138,7 +148,8 @@ public class ProductDetailActivity extends AppCompatActivity {
             Toast.makeText(this, "Mua ngay sản phẩm!", Toast.LENGTH_SHORT).show();
         });
         btnAddToCart.setOnClickListener(v -> {
-            Toast.makeText(this, "Đã thêm vào giỏ hàng!", Toast.LENGTH_SHORT).show();
+            AddToCartDialogFragment dialog = AddToCartDialogFragment.newInstance(productId);
+            dialog.show(getSupportFragmentManager(), "AddToCartDialog");
         });
     }
 

@@ -23,12 +23,17 @@ import java.util.List;
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
     private List<Product> products;
     private Context context;
+    private final OnAddToCartClickListener addToCartListener;
 
-    public ProductAdapter(Context context, List<Product> products) {
-        this.context = context;
-        this.products = products != null ? products : new ArrayList<>();
+    public interface OnAddToCartClickListener {
+        void onAddToCartClicked(String productId);
     }
 
+    public ProductAdapter(Context context, List<Product> products, OnAddToCartClickListener addToCartListener) {
+        this.context = context;
+        this.products = products != null ? products : new ArrayList<>();
+        this.addToCartListener = addToCartListener;
+    }
     public void setProducts(List<Product> products) {
         this.products = products != null ? products : new ArrayList<>();
         notifyDataSetChanged();
@@ -61,8 +66,13 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             intent.putExtra("product_id", p.getProductid());
             context.startActivity(intent);
         });
-    }
 
+        holder.btnCart.setOnClickListener(v -> {
+            if (addToCartListener != null) {
+                addToCartListener.onAddToCartClicked(p.getProductid());
+            }
+        });
+    }
 
     @Override
     public int getItemCount() {
