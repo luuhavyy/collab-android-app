@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -36,13 +37,25 @@
             android:text="x1" />
     </LinearLayout>
 
-    <Button
+<!--    <Button-->
+<!--        android:id="@+id/btn_review"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="@string/review"-->
+<!--        android:visibility="gone"-->
+<!--        android:layout_marginTop="4dp"/>-->
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_review"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:backgroundTint="@color/deep_green"
         android:text="@string/review"
         android:visibility="gone"
-        android:layout_marginTop="4dp"/>
+        android:layout_marginTop="4dp"
+        android:background="@drawable/bg_button_rounded"
+        app:backgroundTint="@null"
+        android:textColor="@android:color/white" />
 </LinearLayout>
 
 
