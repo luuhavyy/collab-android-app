@@ -10,7 +10,7 @@ A key feature is an **AI-powered promotion workflow** that combines customer pur
 
 ## AI Promotion Workflow
 
-<img width="578" height="238" alt="image" src="https://github.com/user-attachments/assets/a42fd842-0cbe-4060-b594-a7b14b550a91" />
+<img width="574" height="238" alt="Screenshot 2026-08-16 230948" src="https://github.com/user-attachments/assets/bd4c3e52-5211-46d3-8569-73dad30fc5b4" />
 
 The workflow uses **n8n** to retrieve customer data from Firebase and connects it with a **Gemini-powered AI Agent**. The agent combines predefined business rules with customer behavior to determine promotion eligibility, discount type, and personalized notification content. The generated results are then stored back in Firebase.
 
